@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Deep Space</title>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		
+		<style>
+			body {
+				background-color: #111111;
+			}
+			.navbar {
+				border: none;
+				border-radius: 0;
+				box-shadow: none;
+				background-image: none;
+				background-color: black;
+			}
+
+			.navbar-brand {
+				line-height: 50px;
+			}
+
+			.navbar-brand__logo {
+				 max-height: 50px;
+				 max-width: 70%;
+				 /*margin-top: -10px;*/
+			 }
+			
+			.alertbar {
+				display: none;
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				background-color: red;
+				color: white;
+				font-weight: bold;
+				padding: 5px;
+			}
+			
+			.alertbar__close {
+				text-align: right;
+			}
+			
+			#star {
+				height: 50px;
+				width: 50px;
+				position: absolute;
+				left: 100px;
+				top: 100px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#"><img class="navbar-brand__logo" src="/images/logo.png"></a>
+				</div>
+			</div>
+		</nav>
+		<div class="container">	
+			<div id="welcomepage" class="page">
+				<img src="images/planets/normalstar.png" id="star" />
+			</div>
+		</div>
+		
+		<div class="alertbar"></div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+		<script src="js/global.js"></script>
+		<script src="js/world.js"></script>
+		<script src="js/ship.js"></script>
+		<script src="js/index.js"></script>
+	</body>
+</html>
