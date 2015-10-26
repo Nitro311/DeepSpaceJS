@@ -1,6 +1,6 @@
 "use strict";
 
-var logging = (function ($) {
+var logging = (function ($, moment) {
 	var $logDiv = $('<div class="logging" style="position: absolute; visiblility: hidden; width: 100%; height: 100px; overflow: auto">');
 
 	$('body').append($logDiv);
@@ -30,4 +30,4 @@ var logging = (function ($) {
 				$logDiv.css('visibility', 'hidden')
 		}
 	};
-}(jQuery));
+}(jQuery, moment));
