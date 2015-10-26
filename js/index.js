@@ -1,49 +1,61 @@
 "use strict";
 
-$(function() {
-	if ("") {
-		$('#alertbar').show();
+var world;
+
+function loadNewWorld() {
+	var createNewWorldDialog = function() {
+		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", createNewWorld);
 	}
-	
-	var world = World.load('Bertha');
-	//new World('Bertha', null, null, null, [], null);
-	
-	//alert(world.players[0].name);
-	//world.save();
-	
-	
-	//easygui.buttonBox("Pick from the choices below", "What do you want to do?", ["Move", "Stay", "Run"], function(index, value) { alert('Clicked: ' + value); });
-	
-	
-	$('#star').click('on', function() {
-		/*$(this).animate({
-			'left': '-=30px',
-			'top': '+=10px',
-		});*/
-		
-	
-		world.players[0].ship = new Trireme();
-		
-		world.save();
-		
-		var text = world.players[0].ship.name;
-		
-		$('.alertbar').text(text).finish().fadeIn().delay(4000).fadeOut();
+
+	var worldChoices = World.getNames().slice(0);
+
+	if (worldChoices.length === 0) {
+		createNewWorldDialog();
+		return;
+	}
+
+	worldChoices.push("New");
+
+	easygui.buttonBox("Choose a world to load:", "World Selector", worldChoices, function(index, value) {
+		if (index === worldChoices.length - 1) {
+			createNewWorldDialog();
+		} else {
+			var loadedWorld = World.load(value);
+
+			if (loadedWorld) {
+				notification.info('Loaded existing world: ' + value);
+				world = loadedWorld;
+			} else {
+				notification.danger('Could not find world to load it: ' + value);
+			}
+		}
 	});
-	
-	$('.alertbar').click('on', function() {
-		$('.alertbar').finish().fadeOut();
-	});
-	
+};
+
+function createNewWorld(name) {
+	if (!name)
+		return;
+
+	world = World.create(name);
+
+	notification.info('Created new world: ' + name);
+};
+
+var world;
+
+$(function() {
 	$('.menu__toggle-log-button').on('click', function() {
 		logging.toggle();
 	});
-	
-	$('.menu__clear-local-storage-button').on('click', function() {
-		logging.info("Clearing local storage");
-		window.localStorage.clear();
-		location.reload();
-		return false;
+
+	$('.menu__clear-storage-button').on('click', function() {
+		logging.info("Clearing storage");
+		storage.clear();
+	});
+
+	$('.menu__load-new-world-button').on('click', function() {
+		logging.info("Loading new world");
+		loadNewWorld();
 	});
 });
 

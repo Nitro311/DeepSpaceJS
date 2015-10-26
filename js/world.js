@@ -11,23 +11,49 @@ class World {
 	}
 };
 
-World.load = function(world_name) {
-	var sectors = storage.loadData(world_name, "sectors");
-	/* if (!sectors)
-		sectors = generate_sectors();*/
-	var ports = storage.loadData(world_name, "ports");
-	/*if (!ports)
-		ports = generate_ports(sectors);*/
+World.getNames = function() {
+	return storage.loadData('*', 'worlds') || [];
+}
+
+World.exists = function(name) {
+	return $.inArray(name, World.getNames()) >= 0;
+}
+
+World.create = function(name) {
+	if (World.exists(name) || name === '*')
+		return;
+
+	// TODO: Implement this function
+	var sectors = null; //generate_sectors();
+	var ports = null; //generate_ports(sectors);
 	// TODO: Figure this out
 	var stardock_location = 0;
-	var chat_log = storage.loadData(world_name, "chatlog");
-	/*if (!chat_log)
-		chat_log = new ChatLog();*/
-	var players = storage.loadData(world_name, "players");
-	if (!players)
-		players = [];
+	var chat_log = null; //new ChatLog();
+	var players = [];
 
-	return new World(world_name, sectors, ports, stardock_location, players, chat_log);
+	var world = new World(name, sectors, ports, stardock_location, players, chat_log);
+	world.save();
+
+	// Add to global world list so it can be discovered later
+	var worldList = World.getNames().slice(0);
+	worldList.push(name);
+	storage.saveData('*', 'worlds', worldList);
+
+	return world;
+};
+
+World.load = function(name) {
+	if (!World.exists(name))
+		return;
+
+	var sectors = storage.loadData(name, "sectors");
+	var ports = storage.loadData(name, "ports");
+	// TODO: Figure this out
+	var stardock_location = 0;
+	var chat_log = storage.loadData(name, "chatlog");
+	var players = storage.loadData(name, "players");
+
+	return new World(name, sectors, ports, stardock_location, players, chat_log);
 };
 
 World.prototype.save = function() {

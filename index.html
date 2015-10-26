@@ -41,22 +41,6 @@
 				 /*margin-top: -10px;*/
 			 }
 
-			.alertbar {
-				display: none;
-				position: absolute;
-				left: 0;
-				top: 0;
-				width: 100%;
-				background-color: red;
-				color: white;
-				font-weight: bold;
-				padding: 5px;
-			}
-
-			.alertbar__close {
-				text-align: right;
-			}
-
 			#star {
 				height: 50px;
 				width: 50px;
@@ -64,7 +48,6 @@
 				left: 100px;
 				top: 100px;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -74,8 +57,9 @@
 					<a class="navbar-brand" href="#"><img class="navbar-brand__logo" src="images/logo.png"></a>
 				</div>
 				<div class="menu">
-					<button class="menu__clear-local-storage-button">Clear Local Storage</button>
+					<button class="menu__clear-storage-button">Clear Storage</button>
 					<button class="menu__toggle-log-button">Toggle Log</button>
+					<button class="menu__load-new-world-button">Load New World</button>
 				</div>
 			</div>
 		</nav>
@@ -85,17 +69,18 @@
 			</div>
 		</div>
 
-		<div class="alertbar"></div>
-
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-		<script src="js/easygui.js"></script>
 
+		<script src="js/easygui.js"></script>
 		<script src="js/storage.js"></script>
 		<script src="js/logging.js"></script>
+		<script src="js/notification.js"></script>
+
 		<script src="js/world.js"></script>
 		<script src="js/ship.js"></script>
+
 		<script src="js/index.js"></script>
 	</body>
 </html>
