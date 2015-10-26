@@ -1,11 +1,14 @@
+/*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
+/*globals moment*/
+/*exported logging*/
 "use strict";
 
-var logging = (function ($, moment) {
+var logging = (function ($, moment, console) {
 	var $logDiv = $('<div class="logging" style="position: absolute; visiblility: hidden; width: 100%; height: 100px; overflow: auto">');
 
 	$('body').append($logDiv);
 
-	var htmlEncode = function(raw) {
+	var htmlEncode = function (raw) {
 		return String(raw)
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')
@@ -15,7 +18,7 @@ var logging = (function ($, moment) {
 	};
 
 	return {
-		info: function(message) {
+		info: function (message) {
 			message = moment().format("YYYY-MM-DDTHH:mm:ss ZZ") + ' - ' + message;
 			console.log(message);
 			$logDiv.append(htmlEncode(message) + '<br/>');
@@ -23,11 +26,12 @@ var logging = (function ($, moment) {
 				scrollTop: $logDiv[0].scrollHeight
 			}, 800);
 		},
-		toggle: function() {
-			if ($logDiv.css('visibility') === 'hidden')
-				$logDiv.css('visibility', 'visible')
-			else
-				$logDiv.css('visibility', 'hidden')
+		toggle: function () {
+			if ($logDiv.css('visibility') === 'hidden') {
+				$logDiv.css('visibility', 'visible');
+			} else {
+				$logDiv.css('visibility', 'hidden');
+			}
 		}
 	};
-}(jQuery, moment));
+}(jQuery, moment, console));

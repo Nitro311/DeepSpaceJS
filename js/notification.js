@@ -1,3 +1,5 @@
+/*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
+/*exported notification*/
 "use strict";
 
 var notification = (function ($) {
@@ -8,12 +10,12 @@ var notification = (function ($) {
 	$notificationDiv.append($alertDiv);
 	$('body').append($notificationDiv);
 
-	$alertDiv.on('click', function() {
+	$alertDiv.on('click', function () {
 		$alertDiv.finish().fadeOut();
 	});
 
 	return {
-		success: function(message, msDuration) {
+		success: function (message, msDuration) {
 			$alertDiv
 				.removeClass()
 				.addClass('alert')
@@ -21,7 +23,7 @@ var notification = (function ($) {
 				.text(message)
 				.finish().fadeIn().delay(msDuration || DEFAULT_DURATION_MS).fadeOut();
 		},
-		info: function(message, msDuration) {
+		info: function (message, msDuration) {
 			$alertDiv
 				.removeClass()
 				.addClass('alert')
@@ -29,7 +31,7 @@ var notification = (function ($) {
 				.text(message)
 				.finish().fadeIn().delay(msDuration || DEFAULT_DURATION_MS).fadeOut();
 		},
-		warning: function(message, msDuration) {
+		warning: function (message, msDuration) {
 			$alertDiv
 				.removeClass()
 				.addClass('alert')
@@ -37,7 +39,7 @@ var notification = (function ($) {
 				.text(message)
 				.finish().fadeIn().delay(msDuration || DEFAULT_DURATION_MS).fadeOut();
 		},
-		danger: function(message, msDuration) {
+		danger: function (message, msDuration) {
 			$alertDiv
 				.removeClass()
 				.addClass('alert')

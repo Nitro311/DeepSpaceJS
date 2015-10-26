@@ -1,17 +1,19 @@
+/*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
+/*exported storage*/
 "use strict";
 
-var storage = (function() {
+var storage = (function (localStorage) {
 	return {
-		loadData: function(world_name, data_name) {
+		loadData: function (world_name, data_name) {
 			var full_path = "worlds/" + world_name + "/" + data_name + ".yaml";
-			return JSON.parse(window.localStorage.getItem(full_path));
+			return JSON.parse(localStorage.getItem(full_path));
 		},
-		saveData: function(world_name, data_name, obj) {
+		saveData: function (world_name, data_name, obj) {
 			var full_path = "worlds/" + world_name + "/" + data_name + ".yaml";
-			window.localStorage.setItem(full_path, JSON.stringify(obj));
+			localStorage.setItem(full_path, JSON.stringify(obj));
 		},
 		clear: function() {
-			window.localStorage.clear();
+			localStorage.clear();
 		}
 	};
-}());
+}(window.localStorage));

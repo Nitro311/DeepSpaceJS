@@ -5,7 +5,7 @@ var easygui = (function ($) {
 
 	$('body').append($askDiv);
 
-	var askMultipleChoice = function(message, title, choices, onComplete) {
+	var askMultipleChoice = function (message, title, choices, onComplete) {
 		var $buttonTray = $('<div class="easygui__button-tray">');
 		var $titleBar = $('<div class="easygui__titlebar">');
 
@@ -18,10 +18,10 @@ var easygui = (function ($) {
 			.append($('<div class="easygui__message">').text(message))
 			.append($buttonTray);
 
-		for(var i = 0; i < choices.length; i++)
+		for (var i = 0; i < choices.length; i++)
 			$buttonTray.append($('<button class="easygui__button" data-index="' + i + '">').text(choices[i]));
 
-		$('.easygui__button').on('click', function() {
+		$('.easygui__button').on('click', function () {
 			$askDiv.hide();
 			if (onComplete) {
 				var index = parseInt($(this).data("index"), 10);
@@ -33,7 +33,7 @@ var easygui = (function ($) {
 			}
 		});
 
-		$('.easygui__close').on('click', function() {
+		$('.easygui__close').on('click', function () {
 			$askDiv.hide();
 		});
 
