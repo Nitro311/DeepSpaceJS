@@ -1,21 +1,33 @@
 "use strict";
 
-var logging = (function () {
-	var logDiv = $('<div class="logging" style="display: none; height: 200px; overflow: auto">');
-	
-	$('body').append(logDiv);
-	
+var logging = (function ($) {
+	var $logDiv = $('<div class="logging" style="position: absolute; visiblility: hidden; width: 100%; height: 100px; overflow: auto">');
+
+	$('body').append($logDiv);
+
+	var htmlEncode = function(raw) {
+		return String(raw)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+	};
+
 	return {
 		info: function(message) {
 			message = moment().format("YYYY-MM-DDTHH:mm:ss ZZ") + ' - ' + message;
 			console.log(message);
-			logDiv.append($('<div/>').html(message).text() + '<br/>');
-			logDiv.stop().animate({
-				scrollTop: logDiv[0].scrollHeight
+			$logDiv.append(htmlEncode(message) + '<br/>');
+			$logDiv.stop().animate({
+				scrollTop: $logDiv[0].scrollHeight
 			}, 800);
 		},
 		toggle: function() {
-			$('.logging').stop().toggle(800);
+			if ($logDiv.css('visibility') === 'hidden')
+				$logDiv.css('visibility', 'visible')
+			else
+				$logDiv.css('visibility', 'hidden')
 		}
 	};
-}());
+}(jQuery));
