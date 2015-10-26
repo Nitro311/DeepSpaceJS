@@ -12,6 +12,8 @@ $(function() {
 	//world.save();
 	
 	
+	//easygui.buttonBox("Pick from the choices below", "What do you want to do?", ["Move", "Stay", "Run"], function(index, value) { alert('Clicked: ' + value); });
+	
 	
 	$('#star').click('on', function() {
 		/*$(this).animate({

@@ -1,0 +1,36 @@
+.easygui {
+	display: none;
+	position: relative;
+	background-color: #f0f0f0;
+	border: black solid 1px;
+	width: 500px;
+}
+.easygui__titlebar {
+	border-bottom: black solid 1px;
+	background-color: gray;
+	color: white;
+	padding: 2px 5px 2px 5px;
+	min-height: 25px;
+}
+.easygui__title {
+	display: inline;
+}
+.easygui__close {
+	float: right;
+	height: 20px;
+	width: 20px;
+}
+.easygui__message {
+	padding: 5px;
+	margin-bottom: 50px;
+}
+.easygui__button-tray {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	padding: 5px;
+	text-align: center;
+}
+.easygui__button {
+	margin: 5px;
+}
