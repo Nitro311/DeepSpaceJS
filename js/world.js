@@ -12,18 +12,18 @@ class World {
 };
 
 World.load = function(world_name) {
-	var sectors = Storage.load_data(world_name, "sectors");
+	var sectors = storage.loadData(world_name, "sectors");
 	/* if (!sectors)
 		sectors = generate_sectors();*/
-	var ports = Storage.load_data(world_name, "ports");
+	var ports = storage.loadData(world_name, "ports");
 	/*if (!ports)
 		ports = generate_ports(sectors);*/
 	// TODO: Figure this out
 	var stardock_location = 0;
-	var chat_log = Storage.load_data(world_name, "chatlog");
+	var chat_log = storage.loadData(world_name, "chatlog");
 	/*if (!chat_log)
 		chat_log = new ChatLog();*/
-	var players = Storage.load_data(world_name, "players");
+	var players = storage.loadData(world_name, "players");
 	if (!players)
 		players = [];
 
@@ -31,10 +31,10 @@ World.load = function(world_name) {
 };
 
 World.prototype.save = function() {
-	Storage.save_data(this.name, "sectors", this.sectors);
-	Storage.save_data(this.name, "ports", this.ports);
-	Storage.save_data(this.name, "chat_log", this.chat_log);
-	Storage.save_data(this.name, "players", this.players);
+	storage.saveData(this.name, "sectors", this.sectors);
+	storage.saveData(this.name, "ports", this.ports);
+	storage.saveData(this.name, "chat_log", this.chat_log);
+	storage.saveData(this.name, "players", this.players);
 }
 
 class Sector {
