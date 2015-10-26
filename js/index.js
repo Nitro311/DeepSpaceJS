@@ -35,7 +35,12 @@ $(function() {
 		$('.alertbar').finish().fadeOut();
 	});
 	
-	$('#clear-local-storage').click('on', function() {
+	$('.menu__toggle-log-button').on('click', function() {
+		logging.toggle();
+	});
+	
+	$('.menu__clear-local-storage-button').on('click', function() {
+		logging.info("Clearing local storage");
 		window.localStorage.clear();
 		location.reload();
 		return false;

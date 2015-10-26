@@ -1,7 +1,7 @@
 "use strict";
 
 var logging = (function () {
-	var logDiv = $('<div class="logging" style="height: 200px; overflow: auto">');
+	var logDiv = $('<div class="logging" style="display: none; height: 200px; overflow: auto">');
 	
 	$('body').append(logDiv);
 	
@@ -13,6 +13,9 @@ var logging = (function () {
 			logDiv.stop().animate({
 				scrollTop: logDiv[0].scrollHeight
 			}, 800);
+		},
+		toggle: function() {
+			$('.logging').stop().toggle(800);
 		}
 	};
 }());
