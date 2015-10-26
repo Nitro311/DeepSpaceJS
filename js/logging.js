@@ -7,6 +7,7 @@ var logging = (function () {
 	
 	return {
 		info: function(message) {
+			message = moment().format("YYYY-MM-DDTHH:mm:ss ZZ") + ' - ' + message;
 			console.log(message);
 			logDiv.append($('<div/>').html(message).text() + '<br/>');
 			logDiv.stop().animate({
