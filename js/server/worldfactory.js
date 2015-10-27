@@ -1,25 +1,7 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
-/*globals storage, logging*/
+/*globals storage, logging, World, Sector*/
 /*exported worldFactory*/
 "use strict";
-
-class World {
-	constructor(name, sectors, ports, stardock_location, players, chat_log) {
-		this.name = name;
-		this.sectors = sectors;
-		this.ports = ports;
-		this.stardock_location = stardock_location;
-		this.players = players;
-		this.chat_log = chat_log;
-	}
-};
-
-World.prototype.save = function() {
-	storage.saveData(this.name, "sectors", this.sectors);
-	storage.saveData(this.name, "ports", this.ports);
-	storage.saveData(this.name, "chat_log", this.chat_log);
-	storage.saveData(this.name, "players", this.players);
-};
 
 var worldFactory = (function ($, storage, logging) {
 	var randomChoice = function (arr) {
@@ -89,7 +71,7 @@ var worldFactory = (function ($, storage, logging) {
 			sectors[from_id].warps.push(to_id);
 		}
 
-		return sectors
+		return sectors;
 	};
 
 	var generatePorts = function (sectors) {
@@ -143,32 +125,3 @@ var worldFactory = (function ($, storage, logging) {
 		}
 	};
 }(jQuery, storage, logging));
-
-class Sector {
-	constructor(name, routes, warps) {
-		this.name = name;
-		this.routes = routes;
-		this.warps = warps;
-	}
-};
-
-class Player {
-	constructor() {
-		this.name = "";
-		this.gold_coins = 0;
-		this.ship = null;
-		this.location = 0;
-		//this.area = Area.Space
-	}
-};
-
-class Port {
-	constructor() {
-		this.type = "";
-		this.resources = {};
-		this.buy_prices = {};
-		this.sell_prices = {};
-		this.strength = 0;
-		this.created_resources = {};
-	}
-};
