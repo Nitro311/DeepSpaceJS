@@ -25,7 +25,7 @@ function loadDifferentWorldSuccess(worlds) {
 		return;
 	}
 
-	worlds.push("New");
+	worlds.push('New');
 
 	easygui.buttonBox("Choose a world to load:", "World Selector", worlds, function (index, value) {
 		if (index === worlds.length - 1) {

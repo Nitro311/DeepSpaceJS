@@ -18,17 +18,27 @@ var easygui = (function ($) {
 			.append($('<div class="easygui__message">').text(message))
 			.append($buttonTray);
 
-		for (var i = 0; i < choices.length; i++)
-			$buttonTray.append($('<button class="easygui__button" data-index="' + i + '">').text(choices[i]));
-
+		if ($.isArray(choices)) {
+			for (var i = 0; i < choices.length; i++)
+				$buttonTray.append($('<button class="easygui__button">').data('index', i).text(choices[i]));
+		} else {
+			// Assuming that it is key/value pairs
+			var i = 0;
+			$.each(choices, function(key, value) {
+				$buttonTray.append($('<button class="easygui__button">').data('index', i).data('value', value).text(key));
+				i++;
+			}); 
+		}
+		
 		$('.easygui__button').on('click', function () {
 			$askDiv.hide();
 			if (onComplete) {
 				var index = parseInt($(this).data("index"), 10);
+				var value = $(this).data('value') || choices[index];
 				if ($.isFunction(onComplete)) {
-					onComplete(index, $(this).text());
+					onComplete(index, value);
 				} else if ($.isArray(onComplete)) {
-					onComplete[index]($(this).text());
+					onComplete[index](value);
 				}
 			}
 		});
@@ -113,6 +123,8 @@ Examples:
 	easygui.buttonBox("Pick from the choices below", "What do you want to do?", ["Move", "Stay", "Run"], function(index, value) { alert('Clicked: ' + value); });
 
 	easygui.buttonBox("Pick from the choices below", "What do you want to do?", ["Move", "Stay", "Run"], [function(value) { alert('moved') }, function() { alert('stayed'); }, function() { alert('ran'); }]);
+
+	easygui.buttonBox("Pick from the choices below", "What do you want to do?", { Move:"mv", Stay:"noop", Run:"go" }, function(index, value) { alert('Clicked: ' + value); });
 
 	easygui.inputBox("What is the average speed of an unladen swallow?", "Please answer before continuing", null, "in <b>kph", function(result) { alert('Entered ' + result); });
 */
