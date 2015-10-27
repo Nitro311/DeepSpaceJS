@@ -2,40 +2,6 @@
 /*globals easygui, notification, logging, server*/
 "use strict";
 
-function loadDifferentWorldFailure() {
-	notification.danger("Could not get list of worlds");
-}
-
-function loadDifferentWorldSuccess(worlds) {
-	var createNewWorldDialog = function () {
-		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", function (value) {
-			if (!value) {
-				return;
-			}
-
-			// TODO: Make a valid token
-			var token = value;
-
-			server.worldCreate(token, value, createNewWorldSuccess, createNewWorldFailure);
-		});
-	};
-
-	if (worlds.length === 0) {
-		createNewWorldDialog();
-		return;
-	}
-
-	worlds.push('New');
-
-	easygui.buttonBox("Choose a world to load:", "World Selector", worlds, function (index, value) {
-		if (index === worlds.length - 1) {
-			createNewWorldDialog();
-		} else {
-			server.worldView(value, loadWorldSuccess, loadWorldFailure);
-		}
-	});
-}
-
 function loadWorldSuccess(data) {
 	notification.info('Loaded world: ' + data.world.name);
 	window.world = data.world;
@@ -50,17 +16,17 @@ function loadWorldsSuccess(worlds) {
 	// Loads the list of worlds in the lobby
 	$('.js__lobby__world-table tr:gt(1)').remove();
 	var $clone = $('#js__lobby__row-template').clone().attr('id', '').show();
-	
+
 	for (var i = 0; i < worlds.length; i++) {
 		var $row = $clone.clone();
 		$row.find('.js__lobby__row-template-world').text(worlds[i]);
 		$row.find('.js__lobby__row-template-players').text('???');
-		$row.find('.js__lobby__row-template-action').text('Join').data('token', worlds[i]);
+		$row.find('.js__lobby__row-template-action').data('token', worlds[i]);
 		$('.js__lobby__world-table > tbody:last-child').append($row);
 	}
-	
+
 	$('.js__lobby__row-template-action').on('click', function() {
-		var token = $(this).data('token');		
+		var token = $(this).data('token');
 		server.worldView(token, loadWorldSuccess, loadWorldFailure);
 	});
 }
@@ -74,31 +40,38 @@ function createNewWorldSuccess(data) {
 	server.worldView(data.token, loadWorldSuccess, loadWorldFailure);
 }
 
-function signInSuccess() {
-	var playerData = {
-		name: 'Black Beard',
-		avatar: 'images/pirate-avatar.png',
-		isAdmin: true,
-	};
+function signInSubmit() {
+	server.userAuthenticate($('.js__signin__email').val(), $('.js__signin__password').val(), signInSuccess, signInFailure);
+	return false;
+}
 
+function signInSuccess(data) {
 	// Menu
 	$('.js__nav__account-menu').show();
-	$('.js__nav__profile-name').text(playerData.name);
-	$('.js__nav__profile-image').attr('src', playerData.avatar);
-	if (playerData.isAdmin) {
+	$('.js__nav__profile-name').text(data.email);
+	$('.js__nav__profile-image').attr('src', data.avatar);
+	if (true) {
 		$('.js__nav__admin-menu').show();
 	} else {
 		$('.js__nav__admin-menu').hide();
 	}
 
-	// Views
 	showLobbyView();
+}
 
+function signInFailure() {
+	notification.danger('Sign in failed');
+}
+
+function forgotSubmit() {
+	server.userForgotPassword($('.js__forgot__email').val(), showSignIn, function() {
+		notification.danger('Error while attempting to send password reset');
+	});
 	return false;
 }
 
-function forgotSuccess() {
-	showSignIn();
+function signOutSubmit() {
+	server.userSignOut(signOutSuccess);
 	return false;
 }
 
@@ -107,11 +80,17 @@ function signOutSuccess() {
 	$('.js__nav__admin-menu').hide();
 	showWelcomeView();
 	showSignIn();
+}
+
+function signUpSubmit() {
+	server.userSignUp($('.js__signup__email').val(), $('.js__signup__password').val(), signUpSuccess, function() {
+		notification.danger('Failed to sign up');
+	});
 	return false;
 }
 
-function signUpSuccess() {
-	signInSuccess();
+function signUpSuccess(data) {
+	signInSuccess(data);
 	return false;
 }
 
@@ -172,34 +151,22 @@ $(function () {
 	showWelcomeView();
 
 	// Sign in forms
-	$('.js__signin__form').on('submit', signInSuccess);
+	$('.js__signin__form').on('submit', signInSubmit);
 	$('.js__signin__forgot-password-link').on('click', showForgotPassword);
 	$('.js__signin__signup-link').on('click', showSignUp);
 	$('.js__forgot__signin-link').on('click', showSignIn);
 	$('.js__signup__signin-link').on('click', showSignIn);
-	$('.js__forgot__form').on('submit', forgotSuccess);
-	$('.js__signup__form').on('submit', signUpSuccess);
+	$('.js__forgot__form').on('submit', forgotSubmit);
+	$('.js__signup__form').on('submit', signUpSubmit);
 
 	// Nav menu
-	$('.js__nav__lobby').on('click', showLobbyView);
-	$('.js__nav__signout').on('click', signOutSuccess);
-	$('.js__nav__toggle-log').on('click', function () {
-		logging.toggle();
-	});
+	$('.js__nav__lobby').on('click', function() { showLobbyView(); return true;});
+	$('.js__nav__signout').on('click', signOutSubmit);
+	$('.js__nav__toggle-log').on('click', logging.toggle);
 	$('.js__nav__clear-storage').on('click', function () {
 		server.adminStorageClear(function() {
 			logging.info("Cleared storage");
 			notification.info('Storage cleared');
 		});
 	});
-
-	$('.menu__show-ship-stats-button').on('click', function() {
-		$('.main__ship-stats-view').toggle();
-	});
-
-	$('.menu__load-new-world-button').on('click', function () {
-		logging.info("Loading new world");
-		server.worldList(loadDifferentWorldSuccess, loadDifferentWorldFailure);
-	});
 });
-
