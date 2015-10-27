@@ -37,6 +37,7 @@ function loadDifferentWorldSuccess(worlds) {
 }
 
 function loadWorldSuccess(data) {
+	notification.info('Loaded world: ' + data.world.name);
 	window.world = data.world;
 }
 
@@ -54,6 +55,8 @@ function createNewWorldSuccess(data) {
 }
 
 $(function () {
+	server.worldList(loadDifferentWorldSuccess, loadDifferentWorldFailure);
+
 	$('.menu__toggle-log-button').on('click', function () {
 		logging.toggle();
 	});
