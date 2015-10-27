@@ -43,8 +43,9 @@ var worldFactory = (function ($, storage, logging) {
 
 		new_pool = shuffle(new_pool);
 
-		// TODO: Sector names
-		//var sector_names = shuffle(...);
+		var sector_names = shuffle(starNames);
+		sectors[100].name = sector_names[0];
+		sector_names.splice(0, 1);
 
 		while (new_pool.length > 0) {
 			var new_id = new_pool[0];
@@ -52,8 +53,8 @@ var worldFactory = (function ($, storage, logging) {
 
 			sectors[current_id].routes.push(new_id);
 			sectors[new_id].routes.push(current_id);
-			//sectors[new_id].name = sector_names[0];
-			//sector_names.splice(0, 1);
+			sectors[new_id].name = sector_names[0];
+			sector_names.splice(0, 1);
 
 			new_pool.splice(0, 1);
 			current_pool.push(new_id);
