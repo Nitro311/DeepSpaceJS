@@ -67,6 +67,10 @@ $(function () {
 			notification.info('Storage cleared');
 		});
 	});
+	
+	$('.menu__show-ship-stats-button').on('click', function() {
+		$('.main__ship-stats-view').toggle();
+	});
 
 	$('.menu__load-new-world-button').on('click', function () {
 		logging.info("Loading new world");

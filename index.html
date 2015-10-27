@@ -40,6 +40,10 @@
 				 max-width: 70%;
 				 /*margin-top: -10px;*/
 			 }
+			 
+			 .main__ship-stats-view {
+				display: none;
+			}
 		</style>
 	</head>
 
@@ -50,15 +54,22 @@
 					<a class="navbar-brand" href="#"><img class="navbar-brand__logo" src="images/logo.png"></a>
 				</div>
 				<div class="menu">
-					<button class="menu__clear-storage-button">Clear Storage</button>
-					<button class="menu__toggle-log-button">Toggle Log</button>
-					<button class="menu__load-new-world-button">Load New World</button>
+					<button class="menu__clear-storage-button btn">Clear Storage</button>
+					<button class="menu__toggle-log-button btn">Toggle Log</button>
+					<button class="menu__show-ship-stats-button btn">Ship Stats</button>
 				</div>
 			</div>
 		</nav>
 
-		<div class="container">	
-			<div id="ship_view">
+		<div class="main container">
+			<div class="main__welcome-view">
+				<header style="color:white; font-size:2em; bold;">Welcome</header>
+				<button type="button" class="btn btn-success">Join</button>
+				<button class="menu__load-new-world-button btn btn-warning">Load New World</button>
+				
+			</div>
+			
+			<div class="main__ship-stats-view">
 				<header style="color:white; font-size:2em"> Ship Stats </header>
 			
 				<div class="progress">
