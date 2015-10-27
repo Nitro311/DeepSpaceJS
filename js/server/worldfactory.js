@@ -64,7 +64,7 @@ var worldFactory = (function ($, storage, logging) {
 			var to_id = randomChoice(Object.keys(sectors));
 
 			// Guarantee it is not a loopback
-			while (to_id !== from_id) {
+			while (to_id === from_id) {
 				to_id = randomChoice(Object.keys(sectors));
 			}
 
