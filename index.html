@@ -8,7 +8,7 @@
 
 		<!-- Bootstrap -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.5/darkly/bootstrap.min.css">
 
 		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -20,58 +20,66 @@
 		<link rel="stylesheet" href="css/easygui.css">
 
 		<style>
-			body {
-				background-color: #111111;
-			}
 			.navbar {
-				border: none;
-				border-radius: 0;
-				box-shadow: none;
-				background-image: none;
 				background-color: black;
 			}
 
-			.navbar-brand {
-				line-height: 50px;
+			.nav__logo-link {
+				padding: 0 15px 0 0;
 			}
 
-			.navbar-brand__logo {
-				 max-height: 50px;
-				 max-width: 70%;
-				 /*margin-top: -10px;*/
-			 }
-			 
-			 .main__ship-stats-view {
-				display: none;
+			.nav__profile-link {
+				padding: 0 15px 0 15px !important;
+			}
+
+			.nav__profile-name {
+				display: inline;
 			}
 		</style>
 	</head>
 
 	<body>
 		<nav class="navbar navbar-default">
-			<div class="container">
+			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="#"><img class="navbar-brand__logo" src="images/logo.png"></a>
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand nav__logo-link js__nav__logo-link" href="#"><img class="nav__logo-image" src="images/logo.png" height="60" width="" alt="Deep Space"></a>
 				</div>
-				<div class="menu">
-					<button class="menu__clear-storage-button btn">Clear Storage</button>
-					<button class="menu__toggle-log-button btn">Toggle Log</button>
-					<button class="menu__show-ship-stats-button btn">Ship Stats</button>
+
+				<div class="collapse navbar-collapse" id="navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown js__nav__account-menu" style="display:none">
+							<a href="#" class="dropdown-toggle nav__profile-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><div class="nav__profile-name js__nav__profile-name"></div> <img class="js__nav__profile-image" height="60" width="60"> <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#" class="js__nav__account">Account</a></li>
+								<li><a href="#" class="js__nav__lobby">Return to lobby</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="#" class="js__nav__signout">Sign out</a></li>
+							</ul>
+						</li>
+						<li class="dropdown js__nav__admin-menu" style="display:none">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="#" class="js__nav__toggle-log">Toggle Log</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="#" class="js__nav__clear-storage">Clear storage</a></li>
+							</ul>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</nav>
 
-		<div class="main container">
-			<div class="main__welcome-view">
-				<header style="color:white; font-size:2em; bold;">Welcome</header>
-				<button type="button" class="btn btn-success">Join</button>
-				<button class="menu__load-new-world-button btn btn-warning">Load New World</button>
-				
-			</div>
-			
-			<div class="main__ship-stats-view">
-				<header style="color:white; font-size:2em"> Ship Stats </header>
-			
+		<div class="js__main container">
+
+			<div class="js__play" style="display:none">
+				<h3>Ship Stats</h3>
+
 				<div class="progress">
 					<div class="progress-bar progress-bar-success progress-bar-striped " role="progressbar" aria-valuenow="40"
 						aria-valuemin="0" aria-valuemax="100" style="margin-bottom:20px; width:40%">
@@ -96,9 +104,96 @@
 						20%  (Armor Health)
 					</div>
 				</div>
-				
 			</div>
-			
+
+			<div class="js__lobby" style="display:none">
+				<div class="col-md-9">
+					<table class="js__lobby__world-table table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>World</th>
+								<th>Players</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr id="js__lobby__row-template" style="display:none">
+								<td class="js__lobby__row-template-world"></td>
+								<td class="js__lobby__row-template-players"></td>
+								<td><button type="button" class="js__lobby__row-template-action btn btn-success btn-xs"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<button type="button" class="js__lobby__create-world btn btn-success">Create New World</button>
+				</div>
+			</div>
+
+			<div class="js__welcome" style="display:none">
+				<header style="color:white; font-size:2em; bold;">Welcome</header>
+				Here is some introductory text to make you feel welcome
+
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-6 col-md-7 col-sm-9">
+							<div class="js__signin panel panel-default">
+								<div class="panel-heading">Current player?</div>
+								<form accept-charset="UTF-8" role="form" class="js__signin__form panel-body">
+									<fieldset>
+										<div class="form-group input-group">
+											<span class="input-group-addon">@</span>
+											<input class="form-control" placeholder="Email" name="email" type="email" required="" autocorrect="no" autofocus="" value="test@example.com">
+										</div>
+										<div class="form-group input-group">
+											<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+											<input class="form-control" placeholder="Password" name="password" type="password" value="TEST" required="">
+										</div>
+										<button type="submit" class="btn btn-primary btn-block">Sign in</button>
+										<p class="help-block">
+											<a class="pull-right text-muted js__signin__forgot-password-link" href="#"><small>Forgot your password?</small></a>
+											<a class="pull-left text-muted js__signin__signup-link" href="#"><small>Sign up</small></a>
+										</p>
+									</fieldset>
+								</form>
+							</div>
+							<div class="js__forgot panel panel-default" style="display:none">
+								<div class="panel-heading">Forgot your password?</div>
+								<form accept-charset="UTF-8" role="form" class="js__forgot__form panel-body">
+									<fieldset>
+										<div class="form-group input-group">
+											<span class="input-group-addon">@</span>
+											<input class="form-control" placeholder="Email" name="email" type="email" value="test@example.com" autocorrect="no" required="">
+										</div>
+										<button type="submit" class="btn btn-primary btn-block">Continue</button>
+										<p class="help-block">
+											<a class="text-muted js__forgot__signin-link" href="#"><small>Sign in</small></a>
+										</p>
+									</fieldset>
+								</form>
+							</div>
+							<div class="js__signup panel panel-default" style="display:none">
+								<div class="panel-heading">New player?</div>
+								<form accept-charset="UTF-8" role="form" class="js__signup__form panel-body">
+									<fieldset>
+										<div class="form-group input-group">
+											<span class="input-group-addon">@</span>
+											<input class="form-control" placeholder="Email" name="email" type="email" value="test@example.com" autocorrect="no" required="">
+										</div>
+										<div class="form-group input-group">
+											<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+											<input class="form-control" placeholder="Password" name="password_new" type="password" value="TEST" required="">
+										</div>
+										<button type="submit" class="btn btn-primary btn-block">Sign up</button>
+										<p class="help-block">
+											<a class="text-muted js__signup__signin-link" href="#"><small>Sign in</small></a>
+										</p>
+									</fieldset>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -109,7 +204,7 @@
 		<script src="js/logging.js"></script>
 		<script src="js/notification.js"></script>
 		<script src="js/ship.js"></script>
-		
+
 		<script src="js/server/storage.js"></script>
 		<script src="js/server/world.js"></script>
 		<script src="js/server/server.js"></script>
