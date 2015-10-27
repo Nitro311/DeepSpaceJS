@@ -95,6 +95,7 @@ var worldFactory = (function ($, storage, logging) {
 	var generatePorts = function (sectors) {
 		// TODO: Implement this function
 		logging.info('Generating ports');
+		return {};
 	};
 
 	return {

@@ -2,44 +2,55 @@
 /*globals easygui, World, worldFactory, notification, logging, storage*/
 "use strict";
 
-function loadNewWorld() {
+function loadDifferentWorldFailure() {
+	notification.danger("Could not get list of worlds");
+}
+
+function loadDifferentWorldSuccess(worlds) {
 	var createNewWorldDialog = function () {
-		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", createNewWorld);
+		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", function (value) {
+			if (!value) {
+				return;
+			}
+			
+			// TODO: Make a valid token
+			var token = value;
+
+			server.worldCreate(token, value, createNewWorldSuccess, createNewWorldFailure);
+		});
 	};
 
-	var worldChoices = worldFactory.getNames().slice(0);
-
-	if (worldChoices.length === 0) {
+	if (worlds.length === 0) {
 		createNewWorldDialog();
 		return;
 	}
 
-	worldChoices.push("New");
+	worlds.push("New");
 
-	easygui.buttonBox("Choose a world to load:", "World Selector", worldChoices, function (index, value) {
-		if (index === worldChoices.length - 1) {
+	easygui.buttonBox("Choose a world to load:", "World Selector", worlds, function (index, value) {
+		if (index === worlds.length - 1) {
 			createNewWorldDialog();
 		} else {
-			var loadedWorld = worldFactory.load(value);
-
-			if (loadedWorld) {
-				notification.info('Loaded existing world: ' + value);
-				window.world = loadedWorld;
-			} else {
-				notification.danger('Could not find world to load it: ' + value);
-			}
+			server.worldView(value, loadWorldSuccess, loadWorldFailure); 
 		}
 	});
 }
 
-function createNewWorld(name) {
-	if (!name) {
-		return;
-	}
+function loadWorldSuccess(data) {
+	window.world = data.world;
+}
 
-	window.world = worldFactory.create(name);
+function loadWorldFailure() {
+	notification.danger('Could not find world to load it');
+}
 
-	notification.info('Created new world: ' + name);
+function createNewWorldFailure() {
+	notification.danger("Could not get create world");
+}
+
+function createNewWorldSuccess(data) {
+	notification.info('Created new world: ' + data.name);
+	server.worldView(data.token, loadWorldSuccess, loadWorldFailure);
 }
 
 $(function () {
@@ -48,13 +59,15 @@ $(function () {
 	});
 
 	$('.menu__clear-storage-button').on('click', function () {
-		logging.info("Clearing storage");
-		storage.clear();
+		server.adminStorageClear(function() {
+			logging.info("Cleared storage");
+			notification.info('Storage cleared');
+		});
 	});
 
 	$('.menu__load-new-world-button').on('click', function () {
 		logging.info("Loading new world");
-		loadNewWorld();
+		server.worldList(loadDifferentWorldSuccess, loadDifferentWorldFailure);
 	});
 });
 
