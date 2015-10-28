@@ -12,7 +12,7 @@ var userFactory = (function ($, storage, logging) {
 		}
 		return {
 			email: source.email,
-			avatar: source.avatar
+			avatar: source.avatar || 'images/default-avatar.png'
 		};
 	};
 
@@ -30,21 +30,14 @@ var userFactory = (function ($, storage, logging) {
 				.Any(function (x) { return x.email === email; });
 		},
 		create: function(email, password) {
-			if (!email) {
-				return false;
-			}
-
-			email = email.trim().toLowerCase();
-
 			if (userFactory.exists(email)) {
 				return false;
 			}
 
 			var rawData = loadRaw();
 			var hash = md5(password);
-			var avatarHash = md5(email);
 
-			rawData.push({ email: email, passwordHash: hash, avatar: 'http://www.gravatar.com/avatar/' + avatarHash + '.jpg?s=60&d=mm' });
+			rawData.push({ email: email, passwordHash: hash, avatar: null });
 
 			storage.saveData('*', 'users', rawData);
 		},
