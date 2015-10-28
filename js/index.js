@@ -2,9 +2,18 @@
 /*globals easygui, notification, logging, server*/
 "use strict";
 
+function setPageTitle(title) {
+	if (title) {
+		document.title = title + ' - Deep Space';
+	} else {
+		document.title = 'Deep Space';
+	}
+}
+
 function loadWorldSuccess(data) {
 	notification.info('Loaded world: ' + data.world.name);
 	window.world = data.world;
+	setPageTitle(data.world.name);
 	showPlayView();
 }
 
@@ -95,12 +104,14 @@ function signUpSuccess(data) {
 }
 
 function showWelcomeView() {
+	setPageTitle('Welcome');
 	$('.js__main').children().hide();
 	$('.js__welcome').show();
 	return false;
 }
 
 function showLobbyView() {
+	setPageTitle('Lobby');
 	$('.js__main').children().hide();
 	$('.js__lobby').show();
 	$('.js__lobby__create-world').on('click', function () {
