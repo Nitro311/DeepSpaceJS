@@ -49,8 +49,6 @@ class Port {
 	}
 }
 
-var PortType = Object.freeze({ Stardock: 0, FarmingPort: 1, ManufacturingPort: 2, MiningPort: 3 });
-
 class Sector {
 	constructor(name, routes, warps) {
 		this.name = name;
@@ -89,17 +87,32 @@ class Ship {
 }
 
 class World {
-	constructor(name, sectors, ports, stardock_location, players, chat_log) {
+	constructor(name, token, sectors, ports, players, chat_log) {
 		this.name = name;
+		this.token = token;
 		this.sectors = sectors;
 		this.ports = ports;
-		this.stardock_location = stardock_location;
 		this.players = players;
 		this.chat_log = chat_log;
+		this.stardock_location = null;
+
+		for (var sector of Object.keys(ports)) {
+			if (ports[sector].type === PortType.Stardock) {
+				this.stardock_location = sector;
+				break;
+			}
+		}
 	}
 }
 
 // Ports
+var PortType = Object.freeze({
+	Stardock: 'Stardock',
+	FarmingPort: 'FarmingPort',
+	ManufacturingPort: 'ManufacturingPort',
+	MiningPort: 'MiningPort'
+});
+
 class FarmingPort extends Port {
 	constructor() {
 		super(PortType.FarmingPort);

@@ -1,9 +1,11 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
-/*globals storage, logging, World, Sector*/
+/*globals storage, logging, World, Sector, security*/
 /*exported worldFactory*/
 "use strict";
 
-var worldFactory = (function ($, storage, logging) {
+var worldFactory = (function ($, storage, logging, security) {
+	const GLOBAL_RESERVED = '*';
+
 	var randomChoice = function (arr) {
 		return arr[Math.floor(arr.length * Math.random())];
 	};
@@ -88,13 +90,13 @@ var worldFactory = (function ($, storage, logging) {
 			places_without_port.splice(0, 1);
 		}
 
-		for (var i = 0; i < 100; i++) {
+		for (var j = 0; j < 100; j++) {
 			location = places_without_port[0];
 			ports[location] = new ManufacturingPort()
 			places_without_port.splice(0, 1);
 		}
 
-		for (var i = 0; i < 100; i++) {
+		for (var k = 0; k < 100; k++) {
 			location = places_without_port[0];
 			ports[location] = new FarmingPort()
 			places_without_port.splice(0, 1);
@@ -102,8 +104,8 @@ var worldFactory = (function ($, storage, logging) {
 
 		// Place the star dock in a very well-connected area
 		var stardock_location = 100;
-		for (var i = 0; i < places_without_port.length; i++) {
-			location = places_without_port[i];
+		for (var l = 0; i < places_without_port.length; l++) {
+			location = places_without_port[l];
 			if (sectors[location].routes.length > sectors[stardock_location].routes.length) {
 				stardock_location = location;
 			}
@@ -114,65 +116,80 @@ var worldFactory = (function ($, storage, logging) {
 		return ports;
 	};
 
-	var saveWorld = function (world) {
-		storage.saveData(world.name, 'sectors', world.sectors);
-		storage.saveData(world.name, 'ports', world.ports);
-		storage.saveData(world.name, 'chat_log', world.chat_log);
-		storage.saveData(world.name, 'players', world.players);
-	};
-
 	return {
-		getNames: function() {
-			return storage.loadData('*', 'worlds') || [];
+		getList: function() {
+			return storage.loadData(GLOBAL_RESERVED, 'worlds') || [];
 		},
-		exists: function(name) {
-			return $.inArray(name, worldFactory.getNames()) >= 0;
+		existsByName: function(name) {
+			var worlds = worldFactory.getList();
+
+			for (var world of worlds) {
+				if (world.name === name) {
+					return true;
+				}
+			}
+
+			return false;
 		},
-		create: function(name) {
-			if (worldFactory.exists(name) || name === '*') {
+		existsByToken: function(token) {
+			var worlds = worldFactory.getList();
+
+			for (var world of worlds) {
+				if (world.token === token) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+		create: function(name, proposedToken) {
+			if (!name) {
+				return;
+			}
+			name = name.trim();
+			var token = security.slugify(proposedToken || name);
+
+			if (name === GLOBAL_RESERVED || token === GLOBAL_RESERVED || worldFactory.existsByName(name) || worldFactory.existsByToken(token)) {
 				return;
 			}
 
 			var sectors = generateSectors();
 			var ports = generatePorts(sectors);
-			var stardock_location;
-			for (var sector of Object.keys(ports)) {
-				if (ports[sector].type === PortType.Stardock) {
-					stardock_location = sector;
-					break;
-				}
-			}
 			var chat_log = null; //new ChatLog();
-			var players = [];
+			var players = {};
 
-			var world = new World(name, sectors, ports, stardock_location, players, chat_log);
-			saveWorld(world);
+			var world = new World(name, token, sectors, ports, players, chat_log);
+			this.save(world);
 
 			// Add to global world list so it can be discovered later
-			var worldList = worldFactory.getNames().slice(0);
-			worldList.push(name);
-			storage.saveData('*', 'worlds', worldList);
+			var worldList = worldFactory.getList().slice(0);
+			worldList.push({ name: name, token: token });
+			storage.saveData(GLOBAL_RESERVED, 'worlds', worldList);
 
 			return world;
 		},
-		load: function(name) {
-			if (!worldFactory.exists(name)) {
+		get: function(token) {
+			if (!worldFactory.existsByToken(token)) {
 				return;
 			}
 
-			var sectors = storage.loadData(name, "sectors");
-			var ports = storage.loadData(name, "ports");
-			var stardock_location;
-			for (var sector of Object.keys(ports)) {
-				if (ports[sector].type === PortType.Stardock) {
-					stardock_location = sector;
-					break;
-				}
-			}
-			var chat_log = storage.loadData(name, "chatlog");
-			var players = storage.loadData(name, "players");
+			var metadata = storage.loadData(token, GLOBAL_RESERVED);
+			var sectors = storage.loadData(token, 'sectors');
+			var ports = storage.loadData(token, 'ports');
+			var chat_log = storage.loadData(token, 'chatlog');
+			var players = storage.loadData(token, 'players');
 
-			return new World(name, sectors, ports, stardock_location, players, chat_log);
+			return new World(metadata.name, metadata.token, sectors, ports, players, chat_log);
+		},
+		save: function (world) {
+			storage.saveData(world.token, GLOBAL_RESERVED, { name: world.name, token: world.token });
+			storage.saveData(world.token, 'sectors', world.sectors);
+			storage.saveData(world.token, 'ports', world.ports);
+			storage.saveData(world.token, 'chat_log', world.chat_log);
+			this.savePlayers(world);
+		},
+		savePlayers: function (world) {
+			storage.saveData(world.token, 'players', world.players);
 		}
 	};
-}(jQuery, storage, logging));
+}(jQuery, storage, logging, security));

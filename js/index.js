@@ -10,11 +10,21 @@ function setPageTitle(title) {
 	}
 }
 
+function joinWorldSuccess(data) {
+		// Try to load the world now that you've joined it
+		server.worldView(data.token, loadWorldSuccess, loadWorldFailure);
+}
+
+function joinWorldFailure() {
+	notification.danger('Could not join you to world');
+}
+
 function loadWorldSuccess(data) {
 	notification.info('Loaded world: ' + data.world.name);
 	window.world = data.world;
 	setPageTitle(data.world.name);
 	showPlayView();
+	viewSector();
 }
 
 function loadWorldFailure() {
@@ -28,9 +38,9 @@ function loadWorldsSuccess(worlds) {
 
 	for (var i = 0; i < worlds.length; i++) {
 		var $row = $clone.clone();
-		$row.find('.js__lobby__row-template-world').text(worlds[i]);
+		$row.find('.js__lobby__row-template-world').text(worlds[i].name);
 		$row.find('.js__lobby__row-template-players').text('???');
-		$row.find('.js__lobby__row-template-action').data('token', worlds[i]);
+		$row.find('.js__lobby__row-template-action').data('token', worlds[i].token);
 		$('.js__lobby__world-table > tbody:last-child').append($row);
 	}
 
@@ -41,12 +51,31 @@ function loadWorldsSuccess(worlds) {
 }
 
 function createNewWorldFailure() {
-	notification.danger("Could not get create world");
+	notification.danger("Could not create world.  Check to make sure the name isn't already taken.");
 }
 
 function createNewWorldSuccess(data) {
 	notification.info('Created new world: ' + data.name);
-	server.worldView(data.token, loadWorldSuccess, loadWorldFailure);
+	server.worldJoin(data.token, window.user.token, joinWorldSuccess, joinWorldFailure);
+}
+
+function reloadWorldView() {
+	server.worldView(world.token, function (data) {
+		window.world = data.world;
+		setPageTitle(data.world.name);
+		showPlayView();
+		viewSector();
+	}, function () {
+		notification.warning('Something went wrong and we couldn\'t refresh the page.');
+	});
+}
+
+function playerMoveToSuccess() {
+	reloadWorldView();
+}
+
+function playerMoveToFailure() {
+	notification.warning('Something went wrong during that move');
 }
 
 function signInSubmit() {
@@ -55,6 +84,8 @@ function signInSubmit() {
 }
 
 function signInSuccess(data) {
+	window.user = data;
+
 	// Menu
 	$('.js__nav__account-menu').show();
 	$('.js__nav__profile-name').text(data.email);
@@ -85,6 +116,8 @@ function signOutSubmit() {
 }
 
 function signOutSuccess() {
+	window.user = null;
+
 	$('.js__nav__account-menu').hide();
 	$('.js__nav__admin-menu').hide();
 	showWelcomeView();
@@ -115,20 +148,65 @@ function showLobbyView() {
 	$('.js__main').children().hide();
 	$('.js__lobby').show();
 	$('.js__lobby__create-world').on('click', function () {
-		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", function (value) {
-			if (!value) {
+		easygui.inputBox("What do you want to name your world", "Create New World", null, "example: Phobos", function (name) {
+			if (!name) {
 				return;
 			}
 
-			// TODO: Make a valid token
-			var token = value;
-
-			server.worldCreate(token, value, createNewWorldSuccess, createNewWorldFailure);
+			server.worldCreate(name, null, createNewWorldSuccess, createNewWorldFailure);
 		});
 	});
 
 	server.worldList(loadWorldsSuccess);
 	return false;
+}
+
+function viewSector() {
+	$('.js__play').children().hide();
+
+	var world = window.world;
+	// TODO: Actually get these values
+	var playerLocation = world.players[window.user.token].location;
+	var sector = world.sectors[playerLocation];
+	var port = world.ports[playerLocation];
+	var planet = null; //world.planets[playerLocation];
+
+	var hasWarpDrive = true;
+	var hasWarps = !!sector.warps;
+	var energyRemaining = 1000;
+	var hasPort = !!port;
+	var hasPlanet = false;
+
+	$('.js__play__sector-number').text(playerLocation);
+	$('.js__play__sector-name').text(sector.name);
+
+	if (hasPort) {
+		$('.js__play__port-tray').text('There is a ' + port.type + ' port here');
+	}
+	$('.js__play__port-tray').toggle(hasPort);
+
+	if (hasPlanet) {
+		$('.js__play__planet-tray').text('There is a planet here');
+	}
+	$('.js__play__planet-tray').toggle(hasPlanet);
+
+	$('.js__play__move-tray').empty();
+	for (var route of sector.routes) {
+		var $moveButton = $('<button class="btn js__play__move-button">').text(route).data('sector', route);
+		$('.js__play__move-tray').append($moveButton);
+	}
+	$('.js__play__move-button').on('click', function () {
+		var sector = $(this).data('sector');
+		server.playerMoveTo(world.token, user.token, sector, playerMoveToSuccess, playerMoveToFailure);
+	});
+
+	if (hasWarps && hasWarpDrive) {
+		$('.js__play__warp-tray').text(sector.warps);
+	}
+	$('.js__play__warp-tray').toggle(hasWarps && hasWarpDrive);
+
+	// Show the whole view
+	$('.js__play__sector').show();
 }
 
 function showPlayView() {

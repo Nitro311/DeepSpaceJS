@@ -1,13 +1,13 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
-/*globals worldFactory,storage,userFactory*/
+/*globals Player, worldFactory, storage, userFactory*/
 /*exported server*/
 "use strict";
 
-var server = (function (worldFactory,userFactory,storage) {
+var server = (function (worldFactory, userFactory, storage) {
 	return {
 		OK_RESULT: 200,
 		INVALID_CREDENTIALS: 403,
-		NOT_FOUND_RESULT: 404,
+		NOT_FOUND: 404,
 		SERVER_ERROR: 500,
 		NOT_IMPLEMENTED: 503,
 
@@ -81,20 +81,48 @@ var server = (function (worldFactory,userFactory,storage) {
 				onSuccess(data);
 			}
 		},
+		playerMoveTo: function (worldToken, playerToken, sector, onSuccess, onFailure) {
+			console.log('SERVER POST /worlds/' + worldToken + '/player/' + playerToken + '/move?sector=' + sector);
+
+			var world = worldFactory.get(worldToken);
+			if (!world) {
+				if (onFailure) {
+					onFailure({ code: this.NOT_FOUND });
+				}
+				return;
+			}
+			var player = world.players[playerToken];
+			if (!player) {
+				if (onFailure) {
+					onFailure({ code: this.NOT_FOUND });
+				}
+				return;
+			}
+
+			// TODO: Determine if is valid move
+			// TODO: initiate combat/defenses? Or save that until successful view?
+			player.location = sector;
+
+			worldFactory.savePlayers(world);
+
+			if (onSuccess) {
+				onSuccess();
+			}
+		},
 		worldList: function (onSuccess, onFailure) {
 			console.log('SERVER: GET /worlds');
-			var data = worldFactory.getNames();
+			var data = worldFactory.getList();
 			if (onSuccess) {
 				onSuccess(data);
 			}
 		},
 		worldView: function (token, onSuccess, onFailure) {
 			console.log('SERVER: GET /worlds/' + token);
-			var data = { world: worldFactory.load(token) };
+			var data = { world: worldFactory.get(token) };
 
 			if (!data.world) {
 				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND_RESULT, message: "World not found" });
+					onFailure({ code: this.NOT_FOUND, message: "World not found" });
 				}
 				return;
 			}
@@ -104,27 +132,52 @@ var server = (function (worldFactory,userFactory,storage) {
 				onSuccess(data);
 			}
 		},
-		worldJoin: function (token, onSuccess, onFailure) {
-			console.log('SERVER: POST /worlds/' + token + '/join');
-			var isThere = worldFactory.exists(token);
+		worldJoin: function (token, userToken, onSuccess, onFailure) {
+			console.log('SERVER: POST /worlds/' + token + '/join?user=' + userToken);
+			var world = worldFactory.get(token);
 
-			if (!isThere) {
+			if (!world) {
 				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND_RESULT, message: "World not found" });
+					onFailure({ code: this.NOT_FOUND, message: "World not found" });
+				}
+				return;
+			}
+
+			var user = userFactory.getByToken(userToken);
+
+			if (!user) {
+				if (onFailure) {
+					onFailure({ code: this.NOT_FOUND, message: "User not found" });
+				}
+				return;
+			}
+
+			if (!world.players[user.token]) {
+				var newPlayer = new Player();
+				newPlayer.name = user.email;
+				newPlayer.token = user.token;
+				newPlayer.location = world.stardock_location;
+				world.players[user.token] = newPlayer;
+				worldFactory.save(world);
+			}
+
+			if (onSuccess) {
+				onSuccess(world);
+			}
+		},
+		worldCreate: function(name, token, onSuccess, onFailure) {
+			console.log('SERVER: PUT /worlds?name=' + name + '&token=' + token);
+			var world = worldFactory.create(name, token);
+
+			if (!world) {
+				if (onFailure) {
+					onFailure();
 				}
 				return;
 			}
 
 			if (onSuccess) {
-				onSuccess();
-			}
-		},
-		worldCreate: function(token, name, onSuccess, onFailure) {
-			console.log('SERVER: POST /worlds/' + token + '/create');
-			var world = worldFactory.create(name);
-
-			if (onSuccess) {
-				onSuccess({ name: name, token: token });
+				onSuccess({ name: world.name, token: world.token });
 			}
 		}
 	};
