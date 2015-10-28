@@ -1,6 +1,6 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
 /*exported World, Sector, Player, Port*/
-"use strict";
+'use strict';
 
 class World {
 	constructor(name, sectors, ports, stardock_location, players, chat_log) {
@@ -14,10 +14,10 @@ class World {
 };
 
 World.prototype.save = function() {
-	storage.saveData(this.name, "sectors", this.sectors);
-	storage.saveData(this.name, "ports", this.ports);
-	storage.saveData(this.name, "chat_log", this.chat_log);
-	storage.saveData(this.name, "players", this.players);
+	storage.saveData(this.name, 'sectors', this.sectors);
+	storage.saveData(this.name, 'ports', this.ports);
+	storage.saveData(this.name, 'chat_log', this.chat_log);
+	storage.saveData(this.name, 'players', this.players);
 };
 
 class Sector {
@@ -30,7 +30,7 @@ class Sector {
 
 class Player {
 	constructor() {
-		this.name = "";
+		this.name = '';
 		this.gold_coins = 0;
 		this.ship = null;
 		this.location = 0;
@@ -40,7 +40,7 @@ class Player {
 
 class Port {
 	constructor() {
-		this.type = "";
+		this.type = '';
 		this.resources = {};
 		this.buy_prices = {};
 		this.sell_prices = {};
@@ -48,3 +48,31 @@ class Port {
 		this.created_resources = {};
 	}
 };
+
+class MiningPort extends Port {
+	constructor() {
+		super();
+		this.type = 'Mining Port';
+	}
+}
+
+class FarmingPort extends Port {
+	constructor() {
+		super();
+		this.type = 'Farming Port';
+	}
+}
+
+class ManufacturingPort extends Port {
+	constructor() {
+		super();
+		this.type = 'Manufacturing Port';
+	}
+}
+
+class Stardock extends Port {
+	constructor() {
+		super();
+		this.type = 'Star Dock';
+	}
+}

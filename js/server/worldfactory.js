@@ -76,9 +76,42 @@ var worldFactory = (function ($, storage, logging) {
 	};
 
 	var generatePorts = function (sectors) {
-		// TODO: Implement this function
 		logging.info('Generating ports');
-		return {};
+		
+		var ports = {};
+		var places_without_port = shuffle(Object.keys(sectors));
+		var location;
+
+		for (var i = 0; i < 100; i++) {
+			location = places_without_port[0];
+			ports[location] = new MiningPort();
+			places_without_port.splice(0, 1);
+		}
+
+		for (var i = 0; i < 100; i++) {
+			location = places_without_port[0];
+			ports[location] = new ManufacturingPort()
+			places_without_port.splice(0, 1);
+		}
+
+		for (var i = 0; i < 100; i++) {
+			location = places_without_port[0];
+			ports[location] = new FarmingPort()
+			places_without_port.splice(0, 1);
+		}
+
+		// Place the star dock in a very well-connected area
+		var stardock_location = 100;
+		for (var i = 0; i < places_without_port.length; i++) {
+			location = places_without_port[i];			
+			if (sectors[location].routes.length > sectors[stardock_location].routes.length) {
+				stardock_location = location;
+			}
+		}
+		sectors[stardock_location].name = "Star Dock"
+		ports[stardock_location] = new Stardock();
+
+		return ports;
 	};
 
 	return {
