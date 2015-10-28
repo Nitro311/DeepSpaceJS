@@ -1,0 +1,182 @@
+<html>
+<body>
+<script>
+
+/*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
+"use strict";
+
+class Sector {
+	constructor(routes) {
+		this.routes = routes;
+	}
+}
+
+/*var sector = (function () {
+	return new {
+		routes: []
+	}
+}());*/
+
+// TODO: Write tests
+
+// start - ID of start sector
+// end - ID of end sector
+// knownSectors - dictionary of sectors by ID
+// returns [] if no path could be found
+function findShortestPath(start, end, knownSectors) {
+	if (!knownSectors || knownSectors.length === 0) {
+		return [];
+	}
+
+	if (!knownSectors[start]) {
+		return [];
+	}
+
+	if (start == end) {
+		return [];
+	}
+
+	// it is possible that the end exists on at knownSector[N].routes so we don't check for !knownSectors[end]
+
+	var shortestPath = findShortestPathRecursive(start, end, knownSectors, [start]);
+
+	if (shortestPath.length > 0) {
+		// Trim off the first record, as it is always the start
+		return shortestPath.splice(1);
+	}
+
+	return [];
+}
+
+function findShortestPathRecursive(start, end, knownSectors, currentPath) {
+	var knownSector = knownSectors[start];
+	if (DEBUG) console.log('STARTING.  Starting with sector ' + start + ' with currentPath: ' + currentPath);
+
+	if (!knownSector) {
+		return [];
+	}
+
+	if (start === end) {
+
+	}
+	var routes = knownSector.routes;
+	if (DEBUG) console.log('routes: [' + routes + ']');
+
+	var shortestPath = [];
+	for (var r = 0; r < routes.length; r++) {
+		var route = routes[r];
+		var exploringPath = [];
+		if (DEBUG) console.log('Exploring route #' + r + ': ' + route);
+		if (currentPath.indexOf(route) > -1) {
+			if (DEBUG) console.log('Already explored that way');
+			// Ignore cycles
+			continue;
+		}
+		var currentPathPlusRoute = currentPath.slice(0);
+		currentPathPlusRoute.push(route);
+
+		if (route === end) {
+			if (DEBUG) console.log('WE HAVE FOUND AN END ROUTE');
+			if (shortestPath.length === 0 || currentPathPlusRoute.length < shortestPath.length) {
+				shortestPath = currentPathPlusRoute;
+				if (DEBUG) console.log('set shortestPath to [' + shortestPath + ']');
+				if (DEBUG) console.log('currentPath: [' + currentPath + ']');
+				if (shortestPath.length > 0 && currentPath.length + 1 >= shortestPath.length) {
+					if (DEBUG) console.log('We will not find a shorter path');
+					// We will not find a shorter path
+					break;
+				}
+			}
+		} else {
+			if (DEBUG) console.log('WE MUST EXPLORE DEEPER, following route ' + route);
+			var exploringPath = findShortestPathRecursive(route, end, knownSectors, currentPathPlusRoute);
+			if (exploringPath && (shortestPath.length === 0 || exploringPath.length < shortestPath.length)) {
+				shortestPath = exploringPath;
+				if (DEBUG) console.log('set shortestPath to ' + shortestPath);
+			}
+		}
+	}
+
+	return shortestPath;
+}
+
+function assertListEqual(expected, actual, message) {
+	if (!actual && !expected) {
+		document.write('PASS: ' + message + '<br/>');
+	} else if (!actual) {
+		document.write('FAIL: ' + message + ' - actual value ' + actual + ' does not match expected value undefined' + '<br/>');
+	} else if (!expected) {
+		document.write('FAIL: ' + message + ' - actual value undefined does not match expected value ' + expected + '<br/>');
+	} else if (actual.length !== expected.length) {
+		document.write('FAIL: ' + message + ' - actual length ' + actual.length + ' does not match expected length ' + expected.length + '.  Actual value: ' + actual + '<br/>');
+	} else {
+		for (var i = 0; i < actual.length; i++) {
+			if (actual[i] != expected[i]) {
+				document.write('FAIL: ' + message + ' - actual value[' + i + ']: ' + actual[i] + ' does not match expected[' + i + ']: ' + expected[i] + '<br/>');
+				return;
+			}
+		}
+		document.write('PASS: ' + message + '<br/>');
+	}
+}
+
+
+function assertEqual(expected, actual, message) {
+	if (actual == expected) {
+		document.write('PASS: ' + message + '<br/>');
+	} else {
+		document.write('FAIL: ' + message + ' - actual value ' + actual + ' does not match expected value ' + expected + '<br/>');
+	}
+}
+
+var DEBUG = false;
+
+window.onload = function() {
+	var knownSectors = { 100: new Sector([]) };
+
+/*	assertListEqual([], findShortestPath(100, 100, knownSectors), 'Single Sector, start/end same');
+	assertListEqual([], findShortestPath(100, 200, knownSectors), 'Single Sector, start to unknown end');
+	assertListEqual([], findShortestPath(200, 100, knownSectors), 'Single Sector, unknown start to end');
+	assertListEqual([], findShortestPath(200, 300, knownSectors), 'Single Sector, unknown start to unknown end');
+
+	knownSectors = { 100: new Sector([200]), 200: new Sector([100]) };
+	assertListEqual([], findShortestPath(100, 100, knownSectors), 'Double Sector, start/end same');
+	assertListEqual([200], findShortestPath(100, 200, knownSectors), 'Double Sector, single hop, start to end');
+	assertListEqual([100], findShortestPath(200, 100, knownSectors), 'Double Sector, single hop, end to start');
+	assertListEqual([], findShortestPath(200, 300, knownSectors), 'Double Sector, start to unknown end');
+*/
+	knownSectors = { 100: new Sector([200]), 200: new Sector([100, 300]), 300: new Sector([200]) };
+	assertListEqual([], findShortestPath(100, 100, knownSectors), 'Triple Sector, start/end same');
+	assertListEqual([200], findShortestPath(100, 200, knownSectors), 'Triple Sector, single hop, start to end');
+	assertListEqual([100], findShortestPath(200, 100, knownSectors), 'Triple Sector, single hop, end to start');
+	assertListEqual([200, 300], findShortestPath(100, 300, knownSectors), 'Triple Sector, start to end via bridge');
+	assertListEqual([200, 100], findShortestPath(300, 100, knownSectors), 'Triple Sector, reverse start to end via bridge');
+
+	knownSectors = { 100: new Sector([200]), 200: new Sector([100, 300]), 300: new Sector([200, 400]), 400: new Sector([300]) };
+	assertListEqual([], findShortestPath(300, 300, knownSectors), 'Quad Sector, start/end same');
+	assertListEqual([200], findShortestPath(100, 200, knownSectors), 'Quad Sector, single hop, start to end');
+	assertListEqual([300], findShortestPath(400, 300, knownSectors), 'Quad Sector, single hop, end to start');
+	assertListEqual([200, 300, 400], findShortestPath(100, 400, knownSectors), 'Quad Sector, start to end via bridge');
+	assertListEqual([300, 200, 100], findShortestPath(400, 100, knownSectors), 'Quad Sector, reverse start to end via bridge');
+
+	knownSectors = { 100: new Sector([200]), 200: new Sector([300])};
+	assertListEqual([], findShortestPath(100, 100, knownSectors), 'Single, one-way Sector, start/end same');
+	assertListEqual([200], findShortestPath(100, 200, knownSectors), 'Single, one-way Sector, single hop, start to end');
+	assertListEqual([], findShortestPath(200, 100, knownSectors), 'Single, one-way Sector, no possible way');
+
+	knownSectors = { 100: new Sector([200]), 200: new Sector([100, 300]), 300: new Sector([100, 200]), 400: new Sector([]) };
+	assertListEqual([200], findShortestPath(100, 200, knownSectors), 'Triangle cycle, single hop, start to end');
+	assertListEqual([200, 300], findShortestPath(100, 300, knownSectors), 'Triangle cycle, single hop, end to start');
+	assertListEqual([], findShortestPath(100, 400, knownSectors), 'Triangle cycle, isolated sector, no route');
+	assertListEqual([], findShortestPath(400, 100, knownSectors), 'Triangle cycle, isolated sector, no escape');
+
+	knownSectors = { 100: new Sector([200]), 200: new Sector([100, 300, 500]), 300: new Sector([200, 400]), 400: new Sector([300, 500]), 500: new Sector([200, 400]) };
+	DEBUG = true;
+	assertListEqual([200, 500], findShortestPath(100, 500, knownSectors), 'Long path with shortcut');
+
+
+};
+
+</script>
+</body>
+</html>
