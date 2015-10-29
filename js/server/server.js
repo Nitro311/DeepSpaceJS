@@ -1,9 +1,56 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
-/*globals Player, worldFactory, storage, userFactory, queue, statusCode*/
+/*globals Player, worldFactory, storage, userFactory, queue, statusCode, security*/
 /*exported server*/
 "use strict";
 
-var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
+var server = (function (worldFactory, userFactory, storage, queue, statusCode, security) {
+	const GLOBAL_RESERVED = '*';
+	const SESSION_TOKEN = 'sessionToken';
+	const AUTHENTICATION_TOKENS = 'authenticationTokens';
+
+	function setSessionToken(userToken) {
+		const authenticationDurationDays = 1;
+		var sessionToken = security.randomString(32);
+		var authenticationTokens = storage.loadData(GLOBAL_RESERVED, AUTHENTICATION_TOKENS) || {};
+		authenticationTokens[sessionToken] = userToken;
+		storage.saveData(GLOBAL_RESERVED, AUTHENTICATION_TOKENS, authenticationTokens);
+		Cookies.set(SESSION_TOKEN, sessionToken, { expires: authenticationDurationDays });
+	}
+
+	function getUserFromSessionToken() {
+		var sessionToken = Cookies.get(SESSION_TOKEN);
+
+		if (!sessionToken) {
+			return;
+		}
+
+		var authenticationTokens = storage.loadData(GLOBAL_RESERVED, AUTHENTICATION_TOKENS) || {};
+		var userToken = authenticationTokens[sessionToken];
+
+		if (!userToken) {
+			return;
+		}
+
+		var user = userFactory.getByToken(userToken);
+		if (!user) {
+			return;
+		}
+
+		return user;
+	}
+
+	function removeSessionToken() {
+		var sessionToken = Cookies.get(SESSION_TOKEN);
+
+		var authenticationTokens = storage.loadData(GLOBAL_RESERVED, AUTHENTICATION_TOKENS) || {};
+		if (authenticationTokens[sessionToken]) {
+			delete authenticationTokens[sessionToken];
+			storage.saveData(GLOBAL_RESERVED, AUTHENTICATION_TOKENS, authenticationTokens);
+		}
+
+		Cookies.remove(SESSION_TOKEN);
+	}
+
 	return {
 		routes: null,
 
@@ -23,6 +70,7 @@ var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
 				this.routes[queue.adminStorageClearRoute] = this.adminStorageClear;
 				this.routes[queue.userForgotPasswordRoute] = this.userForgotPassword;
 				this.routes[queue.userSignInRoute] = this.userSignIn;
+				this.routes[queue.userSignInViaCookieRoute] = this.userSignInViaCookie;
 				this.routes[queue.userSignOutRoute] = this.userSignOut;
 				this.routes[queue.userSignUpRoute] = this.userSignUp;
 				this.routes[queue.playerMoveToSectorRoute] = this.playerMoveToSector;
@@ -69,9 +117,22 @@ var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
 				return request.onFailure({ code: statusCode.UNAUTHORIZED });
 			}
 
+			setSessionToken(user.token);
+
+			return request.onSuccess({ code: statusCode.OK, user: user });
+		},
+		userSignInViaCookie: function (request) {
+			var user = getUserFromSessionToken();
+
+			if (!user) {
+				removeSessionToken();
+				return request.onFailure({ code: statusCode.NOT_FOUND });
+			}
+
 			return request.onSuccess({ code: statusCode.OK, user: user });
 		},
 		userSignOut: function(request) {
+			removeSessionToken();
 			return request.onSuccess({ code: statusCode.OK });
 		},
 		userSignUp: function(request) {
@@ -93,6 +154,8 @@ var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
 			if (!user) {
 				return request.onFailure({ code: statusCode.SERVER_ERROR });
 			}
+
+			setSessionToken(user.token);
 
 			return request.onSuccess({ code: statusCode.OK, user: user });
 		},
@@ -173,5 +236,4 @@ var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
 			return request.onSuccess({ code: statusCode.OK, name: world.name, token: world.token });
 		}
 	};
-}(worldFactory, userFactory, storage, queue, statusCode));
-
+}(worldFactory, userFactory, storage, queue, statusCode, security));

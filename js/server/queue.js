@@ -91,6 +91,15 @@ var queue = (function () {
 			};
 		},
 
+		userSignInViaCookieRoute: 'POST /users/signin/cookies',
+		userSignInViaCookieRequest: function (onSuccess, onFailure) {
+			return {
+				route: this.userSignInViaCookieRoute,
+				onSuccess: onSuccess || function (userSignInSuccessResponse) {},
+				onFailure: onFailure || this.notFoundResponse,
+			};
+		},
+
 		userSignOutRoute: 'POST /users/signout',
 		userSignOutRequest: function (userToken, onSuccess, onFailure) {
 			return {

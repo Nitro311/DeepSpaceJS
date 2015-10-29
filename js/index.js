@@ -246,7 +246,7 @@ function showSignUp() {
 }
 
 $(function () {
-	showWelcomeView();
+	server.send(queue.userSignInViaCookieRequest(signInSuccess, showWelcomeView));
 
 	// Sign in forms
 	$('.js__signin__form').on('submit', signInSubmit);
