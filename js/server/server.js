@@ -1,155 +1,154 @@
 /*jshint browser: true, devel: true, jquery: true, globalstrict: true*/
-/*globals Player, worldFactory, storage, userFactory*/
+/*globals Player, worldFactory, storage, userFactory, queue, statusCode*/
 /*exported server*/
 "use strict";
 
-var server = (function (worldFactory, userFactory, storage) {
+var server = (function (worldFactory, userFactory, storage, queue, statusCode) {
 	return {
-		OK_RESULT: 200,
-		INVALID_CREDENTIALS: 403,
-		NOT_FOUND: 404,
-		SERVER_ERROR: 500,
-		NOT_IMPLEMENTED: 503,
+		routes: null,
 
-		adminStorageClear: function (onSuccess, onFailure) {
-			console.log('SERVER: DELETE /admin/storage');
+		send: function (request) {
+			if (!request) {
+				return;
+			}
+			if (!request.route) {
+				console.log('No route specified in queue request: ' + request);
+				console.log(request);
+				return;
+			}
+
+			if (!this.routes) {
+				console.log('Loading route table');
+				this.routes = {};
+				this.routes[queue.adminStorageClearRoute] = this.adminStorageClear;
+				this.routes[queue.userForgotPasswordRoute] = this.userForgotPassword;
+				this.routes[queue.userSignInRoute] = this.userSignIn;
+				this.routes[queue.userSignOutRoute] = this.userSignOut;
+				this.routes[queue.userSignUpRoute] = this.userSignUp;
+				this.routes[queue.playerMoveToSectorRoute] = this.playerMoveToSector;
+				this.routes[queue.playerViewSectorRoute] = this.playerViewSector;
+				this.routes[queue.worldCreateRoute] = this.worldCreate;
+				this.routes[queue.worldJoinRoute] = this.worldJoin;
+				this.routes[queue.worldsGetRoute] = this.worldsGet;
+			}
+
+			console.log('INITIATING: ' + request.route);
+
+			var action = this.routes[request.route];
+
+			if (action) {
+				action(request);
+			} else {
+				console.log('Unrecognized queue request: ' + request.route + '. Check that the route exists AND the method is defined');
+			}
+
+			console.log('COMPLETED: ' + request.route);
+		},
+
+		adminStorageClear: function (request) {
+			if (!request.userToken) {
+				return request.onFailure({ code: statusCode.NOT_FOUND });
+			}
+
+			// TODO: Check if authorized
+			if (request.userToken === 'NON-ADMIN-USER') {
+				return request.onFailure({ code: statusCode.UNAUTHORIZED });
+			}
+
 			storage.clear();
 
-			if (onSuccess) {
-				onSuccess();
-			}
+			return request.onSuccess();
 		},
-		userAuthenticate: function (email, password, onSuccess, onFailure) {
-			console.log('SERVER: POST /users/authenticate');
 
-			var data = userFactory.getOnValidSignIn(email, password);
-			if (!data) {
-				if (onFailure) {
-					onFailure({ code: this.INVALID_CREDENTIALS });
-				}
-
-				return;
+		userForgotPassword: function(request) {
+			return request.onFailure({ code: statusCode.NOT_IMPLEMENTED });
+		},
+		userSignIn: function (request) {
+			var user = userFactory.getOnValidSignIn(request.email, request.password);
+			if (!user) {
+				return request.onFailure({ code: statusCode.UNAUTHORIZED });
 			}
 
-			if (onSuccess) {
-				onSuccess(data);
-			}
+			return request.onSuccess({ code: statusCode.OK, user: user });
 		},
-		userForgotPassword: function(email, onSuccess, onFailure) {
-			console.log('SERVER: POST /users/forgot');
-			if (onFailure) {
-				onFailure({ code: this.NOT_IMPLEMENTED });
-			}
+		userSignOut: function(request) {
+			return request.onSuccess({ code: statusCode.OK });
 		},
-		userSignOut: function(onSuccess, onFailure) {
-			console.log('SERVER: POST /users/signout');
-			if (onSuccess) {
-				onSuccess();
-			}
-		},
-		userSignUp: function(email, password, onSuccess, onFailure) {
-			console.log('SERVER: POST /users/signup');
-			var data;
+		userSignUp: function(request) {
+			var user;
 
 			// Check if user already exists, if so, try to sign them in
-			if (userFactory.exists(email)) {
-				data = userFactory.getOnValidSignIn(email, password);
-				if (!data) {
-					if (onFailure) {
-						onFailure({ code: this.INVALID_CREDENTIALS });
-					}
-
-					return;
-				}
-
-				if (onSuccess) {
-					onSuccess(data);
+			if (userFactory.exists(request.email)) {
+				user = userFactory.getOnValidSignIn(request.email, request.password);
+				if (!user) {
+					return request.onFailure({ code: statusCode.CONFLICT });
+				} else {
+					return request.onSuccess({ code: statusCode.OK, user: user });
 				}
 			}
 
-			userFactory.create(email, password);
-			data = userFactory.get(email);
+			userFactory.create(request.email, request.password);
+			user = userFactory.get(request.email);
 
-			if (!data) {
-				if (onFailure) {
-					onFailure({ code: this.SERVER_ERROR });
-				}
-				return;
+			if (!user) {
+				return request.onFailure({ code: statusCode.SERVER_ERROR });
 			}
 
-			if (onSuccess) {
-				onSuccess(data);
-			}
+			return request.onSuccess({ code: statusCode.OK, user: user });
 		},
-		playerMoveTo: function (worldToken, playerToken, sector, onSuccess, onFailure) {
-			console.log('SERVER POST /worlds/' + worldToken + '/player/' + playerToken + '/move?sector=' + sector);
 
-			var world = worldFactory.get(worldToken);
+		playerMoveToSector: function (request) {
+			var world = worldFactory.get(request.worldToken);
 			if (!world) {
-				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND });
-				}
-				return;
+				return request.onFailure({ code: statusCode.NOT_FOUND });
 			}
-			var player = world.players[playerToken];
+			var player = world.players[request.playerToken];
 			if (!player) {
-				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND });
-				}
-				return;
+				return request.onFailure({ code: statusCode.NOT_FOUND });
 			}
 
-			// TODO: Determine if is valid move
+			if (world.sectors[player.location].routes.indexOf(request.sector) < 0) {
+				return request.onFailure({ code: statusCode.NOT_ALLOWED });
+			}
+
 			// TODO: initiate combat/defenses? Or save that until successful view?
-			player.location = sector;
+			player.location = request.sector;
 
 			worldFactory.savePlayers(world);
 
-			if (onSuccess) {
-				onSuccess();
-			}
+			return request.onSuccess({ code: statusCode.OK, world: world, player: player });
 		},
-		worldList: function (onSuccess, onFailure) {
-			console.log('SERVER: GET /worlds');
-			var data = worldFactory.getList();
-			if (onSuccess) {
-				onSuccess(data);
-			}
-		},
-		worldView: function (token, onSuccess, onFailure) {
-			console.log('SERVER: GET /worlds/' + token);
-			var data = { world: worldFactory.get(token) };
 
-			if (!data.world) {
-				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND, message: "World not found" });
-				}
-				return;
+		playerViewSector: function (request) {
+			var world = worldFactory.get(request.worldToken);
+			if (!world) {
+				return request.onFailure({ code: statusCode.NOT_FOUND });
+			}
+			var player = world.players[request.playerToken];
+			if (!player) {
+				return request.onFailure({ code: statusCode.NOT_FOUND });
 			}
 
-			if (onSuccess) {
-				// TODO: Map this data
-				onSuccess(data);
-			}
+			return request.onSuccess({ code: statusCode.OK, world: world, player: player });
 		},
-		worldJoin: function (token, userToken, onSuccess, onFailure) {
-			console.log('SERVER: POST /worlds/' + token + '/join?user=' + userToken);
-			var world = worldFactory.get(token);
+
+		worldsGet: function (request) {
+			var worlds = worldFactory.getList();
+
+			// TODO: Determine if user is signed in using request.userToken
+			return request.onSuccess({ code: statusCode.OK, worlds: worlds });
+		},
+		worldJoin: function (request) {
+			var world = worldFactory.get(request.worldToken);
 
 			if (!world) {
-				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND, message: "World not found" });
-				}
-				return;
+				return request.onFailure({ code: statusCode.NOT_FOUND, message: "World not found" });
 			}
 
-			var user = userFactory.getByToken(userToken);
+			var user = userFactory.getByToken(request.userToken);
 
 			if (!user) {
-				if (onFailure) {
-					onFailure({ code: this.NOT_FOUND, message: "User not found" });
-				}
-				return;
+				return request.onFailure({ code: statusCode.NOT_FOUND, message: "User not found" });
 			}
 
 			if (!world.players[user.token]) {
@@ -161,24 +160,18 @@ var server = (function (worldFactory, userFactory, storage) {
 				worldFactory.save(world);
 			}
 
-			if (onSuccess) {
-				onSuccess(world);
-			}
+			return request.onSuccess({ code: statusCode.OK, world: world, player: world.players[user.token] });
 		},
-		worldCreate: function(name, token, onSuccess, onFailure) {
-			console.log('SERVER: PUT /worlds?name=' + name + '&token=' + token);
-			var world = worldFactory.create(name, token);
+		worldCreate: function(request) {
+			// TODO: Use the request.userToken at some point
+			var world = worldFactory.create(request.name, request.proposedWorldToken);
 
 			if (!world) {
-				if (onFailure) {
-					onFailure();
-				}
-				return;
+				return request.onFailure({ code: statusCode.SERVER_ERROR });
 			}
 
-			if (onSuccess) {
-				onSuccess({ name: world.name, token: world.token });
-			}
+			return request.onSuccess({ code: statusCode.OK, name: world.name, token: world.token });
 		}
 	};
-}(worldFactory, userFactory, storage));
+}(worldFactory, userFactory, storage, queue, statusCode));
+

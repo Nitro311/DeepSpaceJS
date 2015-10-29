@@ -10,28 +10,37 @@ function setPageTitle(title) {
 	}
 }
 
-function joinWorldSuccess(data) {
-		// Try to load the world now that you've joined it
-		server.worldView(data.token, loadWorldSuccess, loadWorldFailure);
+function storageClearSuccess(response) {
+	logging.info("Cleared storage");
+	notification.info('Storage cleared');
+	window.reload();
+}
+
+function storageClearFailure(response) {
+	notification.danger('Error clearing storage ' + response.code);
+}
+
+function createWorldSuccess(response) {
+	notification.info('Created world ' + response.name);
+	server.send(queue.worldJoinRequest(response.token, window.user.token, joinWorldSuccess, joinWorldFailure));
+}
+
+function createWorldFailure() {
+	notification.danger('Could not create your world');
+}
+
+function joinWorldSuccess(response) {
+	window.world = response.world;
+	window.player = response.player;
+	reloadWorldView();
 }
 
 function joinWorldFailure() {
 	notification.danger('Could not join you to world');
 }
 
-function loadWorldSuccess(data) {
-	notification.info('Loaded world: ' + data.world.name);
-	window.world = data.world;
-	setPageTitle(data.world.name);
-	showPlayView();
-	viewSector();
-}
-
-function loadWorldFailure() {
-	notification.danger('Could not find world to load it');
-}
-
-function loadWorldsSuccess(worlds) {
+function loadWorldsSuccess(response) {
+	var worlds = response.worlds;
 	// Loads the list of worlds in the lobby
 	$('.js__lobby__world-table tr:gt(1)').remove();
 	var $clone = $('#js__lobby__row-template').clone().attr('id', '').show();
@@ -39,57 +48,51 @@ function loadWorldsSuccess(worlds) {
 	for (var i = 0; i < worlds.length; i++) {
 		var $row = $clone.clone();
 		$row.find('.js__lobby__row-template-world').text(worlds[i].name);
-		$row.find('.js__lobby__row-template-players').text('???');
-		$row.find('.js__lobby__row-template-action').data('token', worlds[i].token);
+		$row.find('.js__lobby__row-template-players').text(worlds[i].playerCount);
+		$row.find('.js__lobby__row-template-action').data('token', worlds[i].token).text(worlds[i].isJoined ? "Play" : "Join");
 		$('.js__lobby__world-table > tbody:last-child').append($row);
 	}
 
 	$('.js__lobby__row-template-action').on('click', function() {
 		var token = $(this).data('token');
-		server.worldView(token, loadWorldSuccess, loadWorldFailure);
+		server.send(queue.worldJoinRequest(token, window.user.token, joinWorldSuccess, joinWorldFailure));
 	});
 }
 
-function createNewWorldFailure() {
-	notification.danger("Could not create world.  Check to make sure the name isn't already taken.");
-}
-
-function createNewWorldSuccess(data) {
-	notification.info('Created new world: ' + data.name);
-	server.worldJoin(data.token, window.user.token, joinWorldSuccess, joinWorldFailure);
-}
-
 function reloadWorldView() {
-	server.worldView(world.token, function (data) {
-		window.world = data.world;
-		setPageTitle(data.world.name);
+	server.send(queue.playerViewSectorRequest(window.world.token, window.player.token, function (response) {
+		window.world = response.world;
+		window.player = response.player;
+		setPageTitle(window.world.name);
 		showPlayView();
 		viewSector();
 	}, function () {
 		notification.warning('Something went wrong and we couldn\'t refresh the page.');
-	});
+	}));
 }
 
-function playerMoveToSuccess() {
+function playerMoveToSuccess(response) {
 	reloadWorldView();
 }
 
-function playerMoveToFailure() {
+function playerMoveToFailure(response) {
 	notification.warning('Something went wrong during that move');
 }
 
 function signInSubmit() {
-	server.userAuthenticate($('.js__signin__email').val(), $('.js__signin__password').val(), signInSuccess, signInFailure);
+	server.send(queue.userSignInRequest($('.js__signin__email').val(), $('.js__signin__password').val(), signInSuccess, signInFailure));
 	return false;
 }
 
-function signInSuccess(data) {
-	window.user = data;
+function signInSuccess(response) {
+	window.user = response.user;
+	window.player = null;
+	window.world = null;
 
 	// Menu
 	$('.js__nav__account-menu').show();
-	$('.js__nav__profile-name').text(data.email);
-	$('.js__nav__profile-image').attr('src', data.avatar);
+	$('.js__nav__profile-name').text(response.user.email);
+	$('.js__nav__profile-image').attr('src', response.user.avatar);
 	if (true) {
 		$('.js__nav__admin-menu').show();
 	} else {
@@ -100,23 +103,30 @@ function signInSuccess(data) {
 }
 
 function signInFailure() {
+	window.user = null;
+	window.player = null;
+	window.world = null;
 	notification.danger('Sign in failed');
 }
 
 function forgotSubmit() {
-	server.userForgotPassword($('.js__forgot__email').val(), showSignIn, function() {
+	server.send(queue.userForgotPasswordRequest($('.js__forgot__email').val(), showSignIn, function() {
 		notification.danger('Error while attempting to send password reset');
-	});
+	}));
 	return false;
 }
 
 function signOutSubmit() {
-	server.userSignOut(signOutSuccess);
+	server.send(queue.userSignOutRequest(window.user.token, signOutSuccess, function() {
+		notification.danger('Error while signing out');
+	}));
 	return false;
 }
 
-function signOutSuccess() {
+function signOutSuccess(response) {
 	window.user = null;
+	window.player = null;
+	window.world = null;
 
 	$('.js__nav__account-menu').hide();
 	$('.js__nav__admin-menu').hide();
@@ -125,14 +135,14 @@ function signOutSuccess() {
 }
 
 function signUpSubmit() {
-	server.userSignUp($('.js__signup__email').val(), $('.js__signup__password').val(), signUpSuccess, function() {
+	server.send(queue.userSignUpRequest($('.js__signup__email').val(), $('.js__signup__password').val(), signUpSuccess, function() {
 		notification.danger('Failed to sign up');
-	});
+	}));
 	return false;
 }
 
-function signUpSuccess(data) {
-	signInSuccess(data);
+function signUpSuccess(response) {
+	signInSuccess(response);
 	return false;
 }
 
@@ -153,23 +163,22 @@ function showLobbyView() {
 				return;
 			}
 
-			server.worldCreate(name, null, createNewWorldSuccess, createNewWorldFailure);
+			server.send(queue.worldCreateRequest(window.user.token, name, null, createWorldSuccess, createWorldFailure));
 		});
 	});
 
-	server.worldList(loadWorldsSuccess);
+	server.send(queue.worldsGetRequest(window.user.token, loadWorldsSuccess));
 	return false;
 }
 
 function viewSector() {
 	$('.js__play').children().hide();
 
-	var world = window.world;
 	// TODO: Actually get these values
-	var playerLocation = world.players[window.user.token].location;
-	var sector = world.sectors[playerLocation];
-	var port = world.ports[playerLocation];
-	var planet = null; //world.planets[playerLocation];
+	var playerLocation = window.world.players[window.user.token].location;
+	var sector = window.world.sectors[playerLocation];
+	var port = window.world.ports[playerLocation];
+	var planet = null; //window.world.planets[playerLocation];
 
 	var hasWarpDrive = true;
 	var hasWarps = !!sector.warps;
@@ -197,7 +206,7 @@ function viewSector() {
 	}
 	$('.js__play__move-button').on('click', function () {
 		var sector = $(this).data('sector');
-		server.playerMoveTo(world.token, user.token, sector, playerMoveToSuccess, playerMoveToFailure);
+		server.send(queue.playerMoveToSectorRequest(window.world.token, window.user.token, sector, playerMoveToSuccess, playerMoveToFailure));
 	});
 
 	if (hasWarps && hasWarpDrive) {
@@ -253,9 +262,6 @@ $(function () {
 	$('.js__nav__signout').on('click', signOutSubmit);
 	$('.js__nav__toggle-log').on('click', logging.toggle);
 	$('.js__nav__clear-storage').on('click', function () {
-		server.adminStorageClear(function() {
-			logging.info("Cleared storage");
-			notification.info('Storage cleared');
-		});
+		server.send(queue.adminStorageClearRequest(window.user.token, storageClearSuccess, storageClearFailure));
 	});
 });
