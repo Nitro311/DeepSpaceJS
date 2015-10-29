@@ -1,5 +1,6 @@
 'use strict';
 
+// Ships
 class Trireme extends Ship {
 	constructor() {
 		super();
@@ -36,8 +37,9 @@ class TutorialShip extends Ship {
 	}
 }
 
-class BasicBubble extends ShieldGenerator {
-	constructor() {
+//Shields
+class BasicBubble extends ShieldGenerator{
+	constructor(){
 		super();
 		this.name = "The Basic Bubble";
 		this.description = "for all your basic shield generator needs";
@@ -49,6 +51,7 @@ class BasicBubble extends ShieldGenerator {
 	}
 }
 
+//Armor
 class Aluminium extends Armor {
 	constructor() {
 		super();
@@ -59,7 +62,7 @@ class Aluminium extends Armor {
 		this.price = 350;
 	}
 }
-
+//Equipment
 class BasicWarpDrive extends Equipment {
 	constructor() {
 		super();
