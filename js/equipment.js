@@ -8,12 +8,35 @@ class IonDrive extends Drive {
 		this.description = "Take you places at a normal pace";
 		this.manufacturer = "Basic Metals Inc.";
 		this.volume = 10;
-		this.mass = 0;
+		this.mass = 20;
 		this.energy_per_use = 1; // PN
 		this.price = 0;
 	}
 }
-
+class WarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Warp Drive";
+		this.description = "Can use warps to create wormholes through space all you need to do to find them";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 10;
+		this.mass = 10;
+		this.energy_per_use = 1; // PN
+		this.price = 0;
+	}
+}
+class TrasWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Trans-Warp Drive";
+		this.description = "Can instantly teleport to the stardock for no energy and Can use warps to create wormholes through space all you need to do to find them";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 10;
+		this.mass = 15;
+		this.energy_per_use = 1; // PN
+		this.price = 0;
+	}
+}
 //Generators
 
 //Shields
