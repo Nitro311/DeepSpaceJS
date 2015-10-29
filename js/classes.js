@@ -10,7 +10,20 @@ class Armor {
 		this.name = '';
 		this.description = '';
 		this.manufacturer = '';
+		this.mass_factor = 1;
 		this.rating = 0; // 0-1000
+		this.price = 0;
+	}
+}
+
+class Drive {
+	constructor() {
+		this.name = '';
+		this.description = '';
+		this.manufacturer = '';
+		this.volume = 10;
+		this.mass = 0;
+		this.energy_per_use = 1; // PN
 		this.price = 0;
 	}
 }
@@ -23,7 +36,18 @@ class Equipment {
 		this.volume = 0;
 		this.mass = 0;
 		this.energy_per_use = 0; // PN
-		this.ability = '';
+		this.price = 0;
+	}
+}
+
+class Generator {
+	constructor() {
+		this.name = '';
+		this.description = '';
+		this.manufacturer = '';
+		this.energy_production = 0; //PN/hr
+		this.volume = 0;
+		this.mass = 0;
 		this.price = 0;
 	}
 }
@@ -74,13 +98,14 @@ class Ship {
 		this.name = '';
 		this.description = '';
 		this.manufacturer = '';
-		this.mass_capacity = 0; // metric tons
+		this.mass = 0; // kg
+		this.mass_capacity = 0; // kg
 		this.volume_capacity = 0; // cu meters
 		this.energy_capacity = 0; // PN
-		this.energy_production = 0; // PN/hour
-		this.energy_per_move = 0; // PN
 		this.price = 0;
-		this.equipment = {}; // warp drive, stealth drive,
+		this.drive = null; // ion/warp drive
+		this.generator = null; // solar panels/nuclear, etc
+		this.equipment = {}; // stealth generator
 		this.shields = null; // ShieldGenerator class?
 		this.armor = null; // Armor class?
 	}

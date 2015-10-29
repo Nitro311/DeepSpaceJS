@@ -104,7 +104,7 @@ var worldFactory = (function ($, storage, logging, security) {
 
 		// Place the star dock in a very well-connected area
 		var stardock_location = 100;
-		for (var l = 0; i < places_without_port.length; l++) {
+		for (var l = 0; l < places_without_port.length; l++) {
 			location = places_without_port[l];
 			if (sectors[location].routes.length > sectors[stardock_location].routes.length) {
 				stardock_location = location;
