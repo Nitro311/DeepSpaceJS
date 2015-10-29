@@ -77,7 +77,7 @@ var worldFactory = (function ($, storage, logging) {
 
 	var generatePorts = function (sectors) {
 		logging.info('Generating ports');
-		
+
 		var ports = {};
 		var places_without_port = shuffle(Object.keys(sectors));
 		var location;
@@ -103,7 +103,7 @@ var worldFactory = (function ($, storage, logging) {
 		// Place the star dock in a very well-connected area
 		var stardock_location = 100;
 		for (var i = 0; i < places_without_port.length; i++) {
-			location = places_without_port[i];			
+			location = places_without_port[i];
 			if (sectors[location].routes.length > sectors[stardock_location].routes.length) {
 				stardock_location = location;
 			}
@@ -112,6 +112,13 @@ var worldFactory = (function ($, storage, logging) {
 		ports[stardock_location] = new Stardock();
 
 		return ports;
+	};
+
+	var saveWorld = function (world) {
+		storage.saveData(world.name, 'sectors', world.sectors);
+		storage.saveData(world.name, 'ports', world.ports);
+		storage.saveData(world.name, 'chat_log', world.chat_log);
+		storage.saveData(world.name, 'players', world.players);
 	};
 
 	return {
@@ -128,13 +135,18 @@ var worldFactory = (function ($, storage, logging) {
 
 			var sectors = generateSectors();
 			var ports = generatePorts(sectors);
-			// TODO: Figure this out
-			var stardock_location = 0;
+			var stardock_location;
+			for (var sector of Object.keys(ports)) {
+				if (ports[sector].type === PortType.Stardock) {
+					stardock_location = sector;
+					break;
+				}
+			}
 			var chat_log = null; //new ChatLog();
 			var players = [];
 
 			var world = new World(name, sectors, ports, stardock_location, players, chat_log);
-			world.save();
+			saveWorld(world);
 
 			// Add to global world list so it can be discovered later
 			var worldList = worldFactory.getNames().slice(0);
@@ -150,8 +162,13 @@ var worldFactory = (function ($, storage, logging) {
 
 			var sectors = storage.loadData(name, "sectors");
 			var ports = storage.loadData(name, "ports");
-			// TODO: Figure this out
-			var stardock_location = 0;
+			var stardock_location;
+			for (var sector of Object.keys(ports)) {
+				if (ports[sector].type === PortType.Stardock) {
+					stardock_location = sector;
+					break;
+				}
+			}
 			var chat_log = storage.loadData(name, "chatlog");
 			var players = storage.loadData(name, "players");
 
