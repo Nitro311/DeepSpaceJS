@@ -14,7 +14,7 @@ class Trireme extends Ship {
 		this.price = 1000;
 		this.equipment = [new WarpDrive()]; // warp drive, stealth drive,
 		this.shields = new BasicBubble(); // ShieldGenerator class?
-		this.armor = new Aluminium(); // Armor class?
+		this.armor = new AluminiumArmor(); // Armor class?
 	}
 }
 
@@ -32,6 +32,6 @@ class TutorialShip extends Ship {
 		this.generator = new Generator();
 		this.equipment = [new WarpDrive()]; // warp drive, stealth drive,
 		this.shields = new BasicBubble(); // ShieldGenerator class?
-		this.armor = new Aluminium(); // Armor class?
+		this.armor = new AluminiumArmor(); // Armor class?
 	}
 }
