@@ -188,6 +188,7 @@ function viewSector() {
 
 	$('.js__play__sector-number').text(playerLocation);
 	$('.js__play__sector-name').text(sector.name);
+	$('.js__play__energy-remaining').text(energyRemaining);
 
 	if (hasPort) {
 		$('.js__play__port-tray').text('There is a ' + port.type + ' port here');
@@ -201,7 +202,7 @@ function viewSector() {
 
 	$('.js__play__move-tray').empty();
 	for (var route of sector.routes) {
-		var $moveButton = $('<button class="btn js__play__move-button">').text(route).data('sector', route);
+		var $moveButton = $('<button class="btn btn-success js__play__move-button" style="margin-right: 10px;">').text(route).data('sector', route);
 		$('.js__play__move-tray').append($moveButton);
 	}
 	$('.js__play__move-button').on('click', function () {
