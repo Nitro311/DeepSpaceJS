@@ -20,7 +20,7 @@ class Drive {
 	constructor() {
 		this.name = '';
 		this.description = '';
-		this.thrust = ; //Horse Power
+		this.thrust = 0 ; //Horse Power
 		this.manufacturer = '';
 		this.volume = 10;
 		this.mass = 0;
@@ -110,8 +110,15 @@ class Ship {
 		this.shields = null; // ShieldGenerator class?
 		this.armor = null; // Armor class?
 	}
+	
+	function energyPerMove(){
+		var mass = this.mass+this.drive.mass+this.generator.mass+this.shield.mass+this.armor.mass
+		for (var e of this.equipment){
+			mass+=e.mass;
+		}
+		return mass/this.drive.thrust
+	}
 }
-
 class World {
 	constructor(name, token, sectors, ports, players, chat_log) {
 		this.name = name;

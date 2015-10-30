@@ -23,12 +23,12 @@ class Gunship extends Ship {
 		this.name = '';
 		this.description = '';
 		this.manufacturer = '';
-		this.mass = 2000; // kg
+		this.mass = 3000; // kg
 		this.mass_capacity = 500; // kg
 		this.volume_capacity = 4500; // cu meters
 		this.energy_capacity = 790; // PN
 		this.price = 3000;
-		this.drive = null; // ion/warp drive
+		this.drive = new RobustIonDrive(); // ion/warp drive
 		this.generator = new BasicSolarPanels(); // solar panels/nuclear, etc
 		this.equipment = {}; // stealth generator
 		this.shields = new SteelBubble(); // ShieldGenerator class?

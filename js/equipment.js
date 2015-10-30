@@ -9,8 +9,8 @@ class BasicIonDrive extends Drive {
 		this.manufacturer = "Pamata Metals Inc.";
 		this.volume = 10;
 		this.mass = 20;
-		this.energy_per_use = 1; // PN
 		this.price = 100;
+		this.thrust = 1000; //Horse Power
 	}
 }
 class BasicWarpDrive extends Drive {
@@ -21,8 +21,8 @@ class BasicWarpDrive extends Drive {
 		this.manufacturer = "Universal Space Administration";
 		this.volume = 10;
 		this.mass = 10;
-		this.energy_per_use = 1; // PN
 		this.price = 300;
+		this.thrust = 1000; //Horse Power
 	}
 }
 class BasicTrasWarpDrive extends Drive {
@@ -33,10 +33,90 @@ class BasicTrasWarpDrive extends Drive {
 		this.manufacturer = "Universal Space Administration";
 		this.volume = 10;
 		this.mass = 15;
-		this.energy_per_use = 1; // PN
 		this.price = 1000;
+		this.thrust = 1000; //Horse Power
 	}
 }
+class QuickTrasWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Quick Trans-Warp Drive";
+		this.description = "Can instantly teleport to the stardock for no energy and Can use warps to create wormholes through space, all you need to do to find them";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 10;
+		this.mass = 20;
+		this.price = 2000;
+		this.thrust = 500; //Horse Power
+	}
+}
+class QuickIonDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Quick Ion Drive";
+		this.description = "Take you places at a normal pace";
+		this.manufacturer = "Pamata Metals Inc.";
+		this.volume = 15;
+		this.mass = 25;
+		this.price = 250;
+		this.thrust = 500; //Horse Power
+	}
+}
+class QuickWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Quick Warp Drive";
+		this.description = "Can use warps to create wormholes through space, all you need to do to find them";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 20;
+		this.mass = 30;
+		this.price = 500;
+		this.thrust = 500; //Horse Power
+	}
+}
+class QuickTrasWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Quick Trans-Warp Drive";
+		this.description = "Can instantly teleport to the stardock for no energy and Can use warps to create wormholes through space, all you need to do to find them";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 15;
+		this.mass = 20;
+		this.price = 2000;
+		this.thrust = 500; //Horse Power
+class RobustIonDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Robust Ion Drive";
+		this.description = "Take you places at a normal pace.  (The robust model is more efficent for larger craft.)";
+		this.manufacturer = "Pamata Metals Inc.";
+		this.volume = 250;
+		this.mass = 300;
+		this.price = 250;
+		this.thrust = 2000; //Horse Power
+	}
+}
+class RobustWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Robust Warp Drive";
+		this.description = "Can use warps to create wormholes through space, all you need to do to find them. The robust model is more efficent for larger craft.)";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 400;
+		this.mass = 300;
+		this.price = 500;
+		this.thrust = 2000; //Horse Power
+	}
+}
+class RobustTrasWarpDrive extends Drive {
+	constructor() {
+		super();
+		this.name = "Quick Trans-Warp Drive";
+		this.description = "Can instantly teleport to the stardock for no energy and Can use warps to create wormholes through space, all you need to do to find them. (The robust model is more efficent for larger craft)";
+		this.manufacturer = "Universal Space Administration";
+		this.volume = 300;
+		this.mass = 250;
+		this.price = 2000;
+		this.thrust = 2000; //Horse Power
 //Generators
 class BasicSolarPanels extends Generator {
 	constructor() {
@@ -51,12 +131,12 @@ class BasicSolarPanels extends Generator {
 }
 class BasicNuclearReactor extends Generator {
 	constructor() {
-		this.name = 'Basic Solar Panels';
+		this.name = 'Basic Nuclear Reactor';
 		this.description = 'creates energy with split atoms';
 		this.manufacturer = 'Eguzki Energy';
-		this.energy_production = 6; //PN/hr
-		this.volume = ;//outdoors
-		this.mass = 10;
+		this.energy_production = 9; //PN/hr
+		this.volume = 1000;
+		this.mass = 1500;
 		this.price = 250;
 	}
 }
@@ -90,7 +170,7 @@ class AluminiumArmor extends Armor {
 	constructor() {
 		super();
 		this.name = "Aluminium Armor";
-		this.description = "light and some what durable";
+		this.description = "Light and some what Durable";
 		this.manufacturer = "Pret Metals Inc.";
 		this.mass_factor = 0.5;
 		this.rating = 75; // 0-1000
@@ -120,3 +200,14 @@ class Magnisum_I_SteelArmor extends Armor {
 	}
 }
 //Equipment
+class StealthDrive extends Equipment {
+	constructor() {
+		this.name = 'Stealth Drive';
+		this.description = 'for all your invisiblity needs (hides you for one sector when activated)';
+		this.manufacturer = 'Universal Space Administration';
+		this.volume = 40;
+		this.mass = 60;
+		this.energy_per_use = 3; // PN
+		this.price = 550;
+	}
+}
