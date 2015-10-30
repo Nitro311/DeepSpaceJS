@@ -215,10 +215,57 @@ function viewSector() {
 	}
 	$('.js__play__warp-tray').toggle(hasWarps && hasWarpDrive);
 
-	initGraph();
-	
 	// Show the whole view
 	$('.js__play__sector').show();
+
+	var json = [];
+	json.push({
+		"adjacencies": sector.routes.map(function (x) { return x.toString(); }),
+		"data": { "$color": "#ff0000", "$dim": sector.routes.length * 2 },
+		"id": playerLocation.toString(),
+		"name": playerLocation.toString()
+	});
+
+	for (var a of sector.routes) {
+		var n1Routes = window.world.sectors[a.toString()].routes;
+		json.push({
+			"adjacencies": n1Routes.map(function (x) { return x.toString(); }),
+			"data": { "$color": "#83548B", "$dim": n1Routes.length },
+			"id": a.toString(),
+			"name": a.toString()
+		});
+		for (var t of n1Routes) {
+			var n2Routes = window.world.sectors[t.toString()].routes;
+			json.push({
+				"adjacencies": n2Routes.map(function (x) { return x.toString(); }),
+				"data": { "$color": "#666666", "$dim": n2Routes.length },
+				"id": t.toString(),
+				"name": t.toString()
+			});
+
+			var n3Routes = window.world.sectors[t.toString()].routes
+			for (var q of n3Routes) {
+			json.push({
+				"adjacencies": [t.toString()],
+				"data": { "$color": "#666666", "$dim": n3Routes.length },
+				"id": q.toString(),
+				"name": q.toString()
+			});
+		}
+		}
+	}
+
+
+	if (!isGraphInitialized) {
+		console.log('initGraph()');
+		initGraph();
+		isGraphInitialized = true;
+	} else {
+		//$('.js__play__map').empty();
+	}
+
+	console.log('loading graph data');
+	loadData(json);
 }
 
 function showPlayView() {
@@ -247,6 +294,8 @@ function showSignUp() {
 	$('.js__signup').show();
 	return false;
 }
+
+var isGraphInitialized = false;
 
 $(function () {
 	server.send(queue.userSignInViaCookieRequest(signInSuccess, showWelcomeView));
