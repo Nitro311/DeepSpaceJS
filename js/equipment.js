@@ -52,7 +52,18 @@ class BasicBubble extends ShieldGenerator{
 		this.price = 250;
 	}
 }
-
+class SteelBubble extends ShieldGenerator{
+	constructor(){
+		super();
+		this.name = "The Steel Bubble";
+		this.description = "a strong but flexible bubble of electrifyed steel gas";
+		this.manufacturer = "Universal Space Adminstration";
+		this.rating = 120; // 0-1000
+		this.mass = 1.5; // metric tons
+		this.energy_for_full_regeneration = 30; // PN
+		this.price = 355;
+	}
+}
 //Armor
 class AluminiumArmor extends Armor {
 	constructor() {
