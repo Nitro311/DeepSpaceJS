@@ -20,6 +20,7 @@ class Drive {
 	constructor() {
 		this.name = '';
 		this.description = '';
+		this.thrust = ; //Horse Power
 		this.manufacturer = '';
 		this.volume = 10;
 		this.mass = 0;
