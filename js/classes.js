@@ -111,12 +111,12 @@ class Ship {
 		this.armor = null; // Armor class?
 	}
 	
-	function energyPerMove(){
+	energyPerMove() {
 		var mass = this.mass+this.drive.mass+this.generator.mass+this.shield.mass+this.armor.mass
 		for (var e of this.equipment){
 			mass+=e.mass;
 		}
-		return mass/this.drive.thrust
+		return mass / this.drive.thrust;
 	}
 }
 class World {
