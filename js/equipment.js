@@ -1,44 +1,65 @@
 'use strict';
 
 //Drives
-class IonDrive extends Drive {
+class BasicIonDrive extends Drive {
 	constructor() {
 		super();
-		this.name = "Ion Drive";
+		this.name = "Basic Ion Drive";
 		this.description = "Take you places at a normal pace";
 		this.manufacturer = "Pamata Metals Inc.";
 		this.volume = 10;
 		this.mass = 20;
 		this.energy_per_use = 1; // PN
-		this.price = 0;
+		this.price = 100;
 	}
 }
-class WarpDrive extends Drive {
+class BasicWarpDrive extends Drive {
 	constructor() {
 		super();
-		this.name = "Warp Drive";
+		this.name = "Basic Warp Drive";
 		this.description = "Can use warps to create wormholes through space, all you need to do to find them";
 		this.manufacturer = "Universal Space Administration";
 		this.volume = 10;
 		this.mass = 10;
 		this.energy_per_use = 1; // PN
-		this.price = 0;
+		this.price = 300;
 	}
 }
-class TrasWarpDrive extends Drive {
+class BasicTrasWarpDrive extends Drive {
 	constructor() {
 		super();
-		this.name = "Trans-Warp Drive";
+		this.name = "Basic Trans-Warp Drive";
 		this.description = "Can instantly teleport to the stardock for no energy and Can use warps to create wormholes through space, all you need to do to find them";
 		this.manufacturer = "Universal Space Administration";
 		this.volume = 10;
 		this.mass = 15;
 		this.energy_per_use = 1; // PN
-		this.price = 0;
+		this.price = 1000;
 	}
 }
 //Generators
-
+class BasicSolarPanels extends Generator {
+	constructor() {
+		this.name = 'Basic Solar Panels';
+		this.description = 'you have to get energy from somewhere';
+		this.manufacturer = 'Eguzki Energy';
+		this.energy_production = 4; //PN/hr
+		this.volume = 0;//outdoors
+		this.mass = 10;
+		this.price = 150;
+	}
+}
+class BasicNuclearReactor extends Generator {
+	constructor() {
+		this.name = 'Basic Solar Panels';
+		this.description = 'creates energy with split atoms';
+		this.manufacturer = 'Eguzki Energy';
+		this.energy_production = 6; //PN/hr
+		this.volume = ;//outdoors
+		this.mass = 10;
+		this.price = 250;
+	}
+}
 //Shields
 class BasicBubble extends ShieldGenerator{
 	constructor(){

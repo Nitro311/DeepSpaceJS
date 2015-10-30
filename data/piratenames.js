@@ -26,337 +26,62 @@ Elizabetha Patrickson
 The Revenge
 Benito de Soto
 Royal Fortune
-
-
-
-
-
 Liberty And The Amity
-
-
-
-
-
 Roberto Cofresi
-
-
-
-
-
 Anne Dieu-le-veut
-
-
-
-
-
 Sandokan
-
-
-
-
-
 Posideons Killer
-
-
-
-
-
 Captain Thomas Tew
-
-
-
-
-
 Queen Annes Revenge
-
-
-
-
-
 Margaret
-
-
-
-
-
 The Howl Of The Wolf
-
-
-
-
-
 Captain Henry Every
-
-
-
-
-
 Captain Kennit
-
-
-
-
-
 Jane de Belleville
-
-
-
-
-
 The Howl Of The Manta
-
-
-
-
-
 Count Maurycy Beniowski
-
-
-
-
-
 The Dishonor Of The North
-
-
-
-
-
 The Damnation Of The Hangman
 Grace O'malley
-
-
-
-
-
 Fancy
-
-
-
-
-
 Anne Dieu-le-veut
-
-
-
-
-
 Satans Doom
-
-
-
-
-
 The Crimson Pirate
-
-
-
-
-
 The Bloody Sadness
-
-
-
-
-
 Captain Richard Worley
-
-
-
-
-
 Captain Blood
-
-
-
-
-
 Delivery
-
-
-
-
-
 Calico Jack
-
-
-
-
-
 Howell Davis
-
-
-
-
-
 Redbeard
-
-
-
-
-
 Long John Silver
-
-
-
-
-
 Roberto Cofresi
-
-
-
-
-
 Captain Tobias Bridge
-
-
-
-
-
 Captain Simon Simonson
-
-
-
-
-
 The Disgraceful Knave
-
-
-
-
-
 Great Fortune
-
-
-
-
-
 Captain Bully Hayes
-
-
-
-
-
 Pearl
-
-
-
-
-
 Captain Christopher Mings
-
-
-
-
-
 Captain Kennit
 Captain John Nutt
-
-
-
-
-
 Lady Elizabeth Killigrew
-
-
-
-
-
 Ching Shih
-
-
-
-
-
 Christina Anna Skytte
-
-
-
-
-
 The Rage Of The Shark
-
-
-
-
-
 The Vile Executioner
-
-
-
-
-
 The Crimson Pirate
-
-
-
-
-
 Captain Horatio Mccallister
-
-
-
-
-
 Captain Christopher Mings
-
-
-
-
-
 The Horrid Slave
-
-
-
-
-
 Black Bart
-
-
-
-
-
 Satans Doom
-
-
-
-
-
 Captain Clegg
-
-
-
-
-
 Jacob
-
-
-
-
-
 Maria Cobham
-
-
-
-
-
 Grace O'malley
-
-
-
-
-
 Morgan
-
-
-
-
-
 The Pirates Of Penzance
-
-
-
-
-
 Captain Simon Simonson
 
 
