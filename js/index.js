@@ -215,6 +215,8 @@ function viewSector() {
 	}
 	$('.js__play__warp-tray').toggle(hasWarps && hasWarpDrive);
 
+	initGraph();
+	
 	// Show the whole view
 	$('.js__play__sector').show();
 }
